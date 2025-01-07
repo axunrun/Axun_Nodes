@@ -27,5 +27,6 @@ class WorkMode:
     FUNCTION = "process"
     CATEGORY = "!Axun Nodes/Queue Tools"
 
-    def switch_mode(self, mode):
+    def process(self, mode):
+        """处理模式切换"""
         return (mode,) 
