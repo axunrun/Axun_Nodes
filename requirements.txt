@@ -1,0 +1,21 @@
+# 基础依赖
+torch>=2.0.0
+numpy>=1.22.0
+Pillow>=9.0.0
+omegaconf>=2.3.0
+safetensors>=0.3.1
+pytorch-lightning>=2.0.0
+accelerate>=0.20.3
+transformers>=4.30.0
+aiohttp>=3.8.0
+
+# 图像处理
+opencv-python>=4.7.0
+
+# Web服务
+comfy>=0.3.0
+
+# 其他工具
+tkinter>=8.6  # 用于目录选择对话框
+logging>=0.5.1.2  # 日志管理
+typing>=3.7.4  # 类型提示
