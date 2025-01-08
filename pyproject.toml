@@ -1,0 +1,13 @@
+[project]
+name = "axun_nodes"
+description = "Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发、SUPIR超分和翻译功能。"
+version = "1.01"
+license = "MIT"
+
+[project.urls]
+Repository = "https://github.com/your-username/axun_nodes"
+
+[tool.comfy]
+PublisherId = "axun"
+DisplayName = "Axun Nodes"
+Icon = "" 

@@ -1,6 +1,6 @@
-# Axun Nodes - ComfyUI 插件
+# Axun Nodes - ComfyUI 插件 v1.01
 
-Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发和SUPIR超分功能。
+Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发、SUPIR超分和翻译功能。
 
 ## 项目结构
 ```
@@ -11,16 +11,21 @@ axun_nodes/
 │   │   ├── queue_trigger.py # 队列触发节点
 │   │   ├── work_mode.py    # 工作模式节点
 │   │   └── dir_picker.py   # 目录选择器节点
-│   └── Supir/          # SUPIR超分节点
-│       ├── supir_sample.py      # 采样器节点
-│       ├── supir_encode.py      # 编码器节点
-│       ├── supir_decode.py      # 解码器节点
-│       ├── supir_first_stage.py # 第一阶段处理节点
-│       ├── supir_conditioner.py # 条件控制节点
-│       └── supir_model_loader.py # 模型加载器
+│   ├── Supir/          # SUPIR超分节点
+│   │   ├── supir_sample.py      # 采样器节点
+│   │   ├── supir_encode.py      # 编码器节点
+│   │   ├── supir_decode.py      # 解码器节点
+│   │   ├── supir_first_stage.py # 第一阶段处理节点
+│   │   ├── supir_conditioner.py # 条件控制节点
+│   │   └── supir_model_loader.py # 模型加载器
+│   └── Translator/     # 翻译功能节点
+│       └── translator_node.py # 翻译节点
 ├── web/                 # 前端实现
 │   └── js/
-│       └── web.js       # 前端交互脚本
+│       ├── web.js       # 前端交互脚本
+│       └── translator.js # 翻译功能脚本
+├── config/             # 配置文件目录
+│   └── translator.json  # 翻译API配置
 ├── __init__.py         # 插件初始化和节点注册
 └── README.md           # 项目说明文档
 ```
@@ -65,6 +70,20 @@ axun_nodes/
   - 模型加载和管理
   - 支持高性能和低内存模式
 
+### Translator 分组
+- 翻译节点 (Translator)
+  - 双击翻译功能
+    - 支持任意文本输入框
+    - 自动检测中英文
+    - 智能互译功能
+  - API集成
+    - 使用百度翻译API
+    - 高质量翻译结果
+  - 性能优化
+    - 防抖处理
+    - 异步请求
+    - 错误重试
+
 ## 设置项说明
 
 ### 路径处理节点 (Path Processor)
@@ -96,6 +115,12 @@ axun_nodes/
 | SUPIR Conditioner | prompt | 提示词 |
 | | clip_skip | CLIP跳过层数 |
 
+### 翻译功能配置
+| 配置项 | 说明 | 默认值 |
+|-------|------|--------|
+| appid | 百度翻译API的APPID | 预设值 |
+| key | 百度翻译API的密钥 | 预设值 |
+
 ## 安装
 1. 将本插件目录放入ComfyUI的`custom_nodes`目录
 2. 安装依赖：`pip install -r requirements.txt`
@@ -105,6 +130,7 @@ axun_nodes/
    - transformers
    - omegaconf
    - einops
+   - requests (用于翻译API)
 3. 确保已安装tkinter：
    - Windows: 通常已预装
    - macOS: `brew install python-tk`
@@ -112,7 +138,10 @@ axun_nodes/
 4. 下载 SUPIR 模型：
    - 从 [Hugging Face](https://huggingface.co/camenduru/SUPIR) 下载模型文件
    - 将模型文件放置在 `ComfyUI/models/supir` 目录下
-5. 重启ComfyUI
+5. 配置翻译功能（可选）：
+   - 编辑 `config/translator.json` 文件
+   - 填入百度翻译API密钥（已预设可用密钥）
+6. 重启ComfyUI
 
 ## 使用说明
 
@@ -146,6 +175,30 @@ axun_nodes/
    - Encode → First Stage → Conditioner → Sample → Decode
 3. 设置相应参数
 4. 运行工作流进行超分处理
+
+### 翻译功能
+1. 在任意文本输入框中输入文字
+2. 双击输入框触发翻译
+3. 自动检测语言并进行翻译：
+   - 中文文本将被翻译为英文
+   - 英文文本将被翻译为中文
+4. 翻译结果会自动替换原文本
+5. 如遇到错误，请查看浏览器控制台
+
+## 更新日志
+
+### v1.01 (2024-01-08)
+- 新增翻译功能
+  - 支持双击翻译
+  - 中英文自动检测
+  - 集成百度翻译API
+  - 添加防抖优化
+  - 配置文件管理
+
+### v1.00
+- 初始版本发布
+  - 实现文件处理工具
+  - 实现SUPIR超分功能
 
 ## 贡献
 欢迎提交Pull Request。对于重大更改，请先创建issue讨论。
