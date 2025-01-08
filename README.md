@@ -32,116 +32,180 @@ axun_nodes/
 └── README.md           # 项目说明文档
 ```
 
-## 功能
+## 功能节点说明
 
 ### Queue Tools 分组
-- 路径处理节点 (Path Processor)
-  - 批量/单文件模式切换
-  - 文件过滤（扩展名/正则表达式）
-  - 文件排序（名称/修改时间/创建时间）
-  - 自动索引管理
-  - 手动索引控制（loop_index）
-    - 支持自动递增
-    - 支持手动设置起始值
-    - 支持批量队列处理
-- 队列触发节点 (Queue Trigger)
-  - 批量处理计数
-  - 自动队列管理
-- 模式切换节点 (Work Mode)
-  - 批量/单文件模式切换
-- 目录选择器 (Directory Picker)
-  - 目录选择和保存
+
+#### Path Processor (路径处理节点)
+**输入参数：**
+- `load_path` (STRING): 输入图像文件夹路径
+- `save_path` (STRING): 输出图像保存路径
+- `filter_type` (COMBO): 文件过滤方式 [regex, extension]
+- `filter_value` (STRING): 过滤条件（正则表达式或文件扩展名）
+- `sort_by` (COMBO): 排序方式 [name, date_modified, date_created]
+- `sort_order` (COMBO): 排序顺序 [asc, desc, random]
+- `path_mode` (COMBO): 处理模式 [Batch Mode, Single Mode]
+- `loop_index` (INT): 当前处理的文件索引
+
+**输出：**
+- `LOAD_PATH`: 当前处理的输入文件路径
+- `SAVE_PATH`: 当前处理的输出文件路径
+- `FILENAME`: 当前处理的文件名
+- `TOTAL_COUNT`: 总文件数
+- `CURRENT_INDEX`: 当前索引
+
+#### Queue Trigger (队列触发节点)
+**输入参数：**
+- `count` (INT): 当前计数
+- `total` (INT): 总数
+- `auto_increment` (BOOLEAN): 是否自动递增
+
+**输出：**
+- `TRIGGER`: 触发信号
+- `INT`: 当前计数
+
+#### Work Mode (模式切换节点)
+**输入参数：**
+- `mode` (COMBO): 工作模式 [Batch Mode, Single Mode]
+
+**输出：**
+- `STRING`: 当前模式
+
+#### Directory Picker (目录选择器)
+**输入参数：**
+- `button` (BUTTON): 目录选择按钮
+- `default_path` (STRING): 默认路径
+
+**输出：**
+- `STRING`: 选择的目录路径
 
 ### SUPIR 分组
-- 采样器节点 (SUPIR Sampler)
-  - 扩散模型采样
-  - 多种采样器选择
-- 编码器节点 (SUPIR Encode)
-  - 图像到潜空间的编码
-  - 分块处理支持
-- 解码器节点 (SUPIR Decode)
-  - 潜空间到图像的解码
-  - 分块处理支持
-- 第一阶段处理节点 (SUPIR First Stage)
-  - 图像预处理
-  - 降噪处理
-- 条件控制节点 (SUPIR Conditioner)
-  - 提示词处理
-  - CLIP模型支持
-- 模型加载器 (SUPIR Model Loader)
-  - 模型加载和管理
-  - 支持高性能和低内存模式
+
+#### SUPIR Model Loader (SUPIR模型加载器)
+**输入参数：**
+- `model_path` (STRING): 模型路径
+- `device` (COMBO): 运行设备 [cuda, cpu]
+- `memory_mode` (COMBO): 内存模式 [high_perf, low_mem]
+
+**输出：**
+- `MODEL`: 加载的模型
+- `CLIP`: CLIP模型
+- `VAE`: VAE模型
+
+#### SUPIR Sample (SUPIR采样器)
+**输入参数：**
+- `model` (MODEL): SUPIR模型
+- `latent` (LATENT): 潜空间数据
+- `steps` (INT): 采样步数
+- `cfg` (FLOAT): 条件缩放因子
+- `sampler_name` (COMBO): 采样器类型
+
+**输出：**
+- `LATENT`: 采样结果
+
+#### SUPIR Encode (SUPIR编码器)
+**输入参数：**
+- `vae` (VAE): VAE模型
+- `image` (IMAGE): 输入图像
+- `tile_size` (INT): 分块大小
+- `overlap` (INT): 重叠像素
+
+**输出：**
+- `LATENT`: 编码后的潜空间数据
+
+#### SUPIR Decode (SUPIR解码器)
+**输入参数：**
+- `vae` (VAE): VAE模型
+- `samples` (LATENT): 潜空间数据
+- `tile_size` (INT): 分块大小
+- `overlap` (INT): 重叠像素
+
+**输出：**
+- `IMAGE`: 解码后的图像
+
+#### SUPIR First Stage (SUPIR第一阶段)
+**输入参数：**
+- `model` (MODEL): SUPIR模型
+- `latent` (LATENT): 潜空间数据
+- `strength` (FLOAT): 降噪强度
+
+**输出：**
+- `LATENT`: 处理后的潜空间数据
+
+#### SUPIR Conditioner (SUPIR条件控制器)
+**输入参数：**
+- `clip` (CLIP): CLIP模型
+- `prompt` (STRING): 提示词
+- `clip_skip` (INT): CLIP跳过层数
+
+**输出：**
+- `CONDITIONING`: 条件控制数据
 
 ### Lotus 分组
-- 模型加载器 (Load Lotus Model)
-  - 加载 Lotus 深度/法线预测模型
-  - 支持 fp16/fp32 精度选择
-  - 自动通道数适配
-- 采样器节点 (Lotus Sampler)
-  - 深度/法线图预测
-  - 批量处理支持
-  - 内存优化管理
-  - 进度显示功能
+
+#### Load Lotus Model (Lotus模型加载器)
+**输入参数：**
+- `model` (COMBO): 模型文件名
+- `precision` (COMBO): 精度选择 [fp16, fp32]
+- `device` (COMBO): 运行设备 [cuda, cpu]
+
+**输出：**
+- `MODEL`: 加载的Lotus模型
+
+#### Lotus Sampler (Lotus采样器)
+**输入参数：**
+- `model` (MODEL): Lotus模型
+- `image` (IMAGE): 输入图像
+- `seed` (INT): 随机种子
+- `per_batch` (INT): 批处理大小
+- `keep_model_loaded` (BOOLEAN): 保持模型加载状态
+
+**输出：**
+- `IMAGE`: 预测的深度/法线图
 
 ### Translator 分组
-- 翻译节点 (Translator)
-  - 双击翻译功能
-    - 支持任意文本输入框
-    - 自动检测中英文
-    - 智能互译功能
-  - API集成
-    - 使用百度翻译API
-    - 高质量翻译结果
-  - 性能优化
-    - 防抖处理
-    - 异步请求
-    - 错误重试
 
-## 设置项说明
+#### Translator (翻译节点)
+**功能：**
+- 双击任意文本输入框触发翻译
+- 自动检测中英文并互译
+- 支持百度翻译API
+- 异步请求和防抖处理
 
-### 路径处理节点 (Path Processor)
-| 英文显示 | 中文含义 | 说明 |
-|---------|---------|------|
-| load_path | 载入路径 | 输入图像文件夹路径 |
-| save_path | 保存路径 | 输出图像保存路径 |
-| filter_type | 过滤类型 | 文件过滤方式：regex(正则表达式) / extension(扩展名) |
-| filter_value | 过滤值 | 过滤条件：正则表达式或文件扩展名 |
-| sort_by | 排序方式 | name(名称) / date_modified(修改时间) / date_created(创建时间) |
-| sort_order | 排序顺序 | asc(升序) / desc(降序) / random(随机) |
-| path_mode | 处理模式 | Batch Mode(批次模式) / Single Mode(单次模式) |
-| loop_index | 循环索引 | 当前处理的文件索引，支持手动设置和自动递增 |
+**配置参数：**
+- `appid` (STRING): 百度翻译API的APPID
+- `key` (STRING): 百度翻译API的密钥
 
-### SUPIR 节点
-| 节点名称 | 主要参数 | 说明 |
-|---------|---------|------|
-| SUPIR Model Loader | model_path | 模型路径 |
-| | device | 运行设备(cuda/cpu) |
-| | memory_mode | 内存模式(high_perf/low_mem) |
-| SUPIR Sampler | steps | 采样步数 |
-| | cfg | 条件缩放因子 |
-| | sampler_name | 采样器类型 |
-| SUPIR Encode | tile_size | 分块大小 |
-| | overlap | 重叠像素 |
-| SUPIR Decode | tile_size | 分块大小 |
-| | overlap | 重叠像素 |
-| SUPIR First Stage | strength | 降噪强度 |
-| SUPIR Conditioner | prompt | 提示词 |
-| | clip_skip | CLIP跳过层数 |
+## 工作流示例
 
-### Lotus 节点
-| 节点名称 | 主要参数 | 说明 |
-|---------|---------|------|
-| Load Lotus Model | model | 模型文件名 |
-| | precision | 精度选择(fp16/fp32) |
-| Lotus Sampler | seed | 随机种子 |
-| | per_batch | 批处理大小 |
-| | keep_model_loaded | 保持模型加载状态 |
+### 1. 批量超分工作流
+```mermaid
+graph LR
+    A[Path Processor] --> B[SUPIR Model Loader]
+    B --> C[SUPIR Encode]
+    C --> D[SUPIR First Stage]
+    D --> E[SUPIR Conditioner]
+    E --> F[SUPIR Sample]
+    F --> G[SUPIR Decode]
+    G --> H[Save Image]
+```
 
-### 翻译功能配置
-| 配置项 | 说明 | 默认值 |
-|-------|------|--------|
-| appid | 百度翻译API的APPID | 预设值 |
-| key | 百度翻译API的密钥 | 预设值 |
+### 2. Lotus深度预测工作流
+```mermaid
+graph LR
+    A[Load Image] --> B[Load Lotus Model]
+    B --> C[Lotus Sampler]
+    C --> D[Save Image]
+```
+
+### 3. 批量处理工作流
+```mermaid
+graph LR
+    A[Directory Picker] --> B[Path Processor]
+    B --> C[Queue Trigger]
+    C --> D[Work Mode]
+    D --> E[Process Node]
+```
 
 ## 安装
 1. 将本插件目录放入ComfyUI的`custom_nodes`目录
@@ -168,56 +232,54 @@ axun_nodes/
    - 填入百度翻译API密钥（已预设可用密钥）
 7. 重启ComfyUI
 
-## 使用说明
+## 使用技巧
 
-### 路径处理节点
-1. 添加"Path Processor"节点
-2. 设置输入路径和过滤条件
-3. 选择批量/单文件模式
-4. 节点将自动处理文件索引和图像加载
-5. loop_index功能：
-   - 在批量模式下自动递增
-   - 可手动设置起始索引值
-   - 支持多次队列执行时自动递增
+### 路径处理
+1. **批量模式**：
+   - 设置 `path_mode` 为 "Batch Mode"
+   - `loop_index` 将自动递增
+   - 配合 Queue Trigger 实现批量处理
 
-### 队列触发节点
-1. 添加"Queue Trigger"节点
-2. 设置计数和总数
-3. 节点将自动管理处理队列
+2. **单文件模式**：
+   - 设置 `path_mode` 为 "Single Mode"
+   - 手动控制 `loop_index`
+   - 适合单文件处理或调试
 
-### 模式切换节点
-1. 添加"Work Mode"节点
-2. 切换批量/单文件模式
+3. **文件过滤**：
+   - 使用扩展名过滤：设置 `filter_type` 为 "extension"，`filter_value` 为 ".png"
+   - 使用正则过滤：设置 `filter_type` 为 "regex"，`filter_value` 为正则表达式
 
-### 目录选择器
-1. 添加"Directory Picker"节点
-2. 选择目录
-3. 目录路径将被保存
+### SUPIR超分
+1. **内存优化**：
+   - 大图像使用 "low_mem" 模式
+   - 调整 tile_size 和 overlap 参数
+   - 使用较小的批处理大小
 
-### SUPIR 超分工作流
-1. 添加"SUPIR Model Loader"节点并加载模型
-2. 构建处理流程：
-   - Encode → First Stage → Conditioner → Sample → Decode
-3. 设置相应参数
-4. 运行工作流进行超分处理
+2. **质量优化**：
+   - 增加采样步数
+   - 调整 cfg 值
+   - 使用更强的提示词
 
-### Lotus 深度/法线预测工作流
-1. 添加 "Load Lotus Model" 节点并加载模型
-2. 连接 "Lotus Sampler" 节点
-3. 设置采样参数：
-   - 调整批处理大小
-   - 设置随机种子
-   - 选择是否保持模型加载
-4. 运行工作流进行深度/法线图预测
+### Lotus深度预测
+1. **性能优化**：
+   - 使用 fp16 精度
+   - 适当调整批处理大小
+   - 根据需要开启 keep_model_loaded
+
+2. **内存管理**：
+   - 处理大批量时减小 per_batch
+   - 不需要时关闭 keep_model_loaded
 
 ### 翻译功能
-1. 在任意文本输入框中输入文字
-2. 双击输入框触发翻译
-3. 自动检测语言并进行翻译：
-   - 中文文本将被翻译为英文
-   - 英文文本将被翻译为中文
-4. 翻译结果会自动替换原文本
-5. 如遇到错误，请查看浏览器控制台
+1. **使用建议**：
+   - 短文本直接双击翻译
+   - 长文本可能需要多次尝试
+   - 注意API限制和配额
+
+2. **错误处理**：
+   - 检查网络连接
+   - 验证API密钥
+   - 查看浏览器控制台错误信息
 
 ## 更新日志
 
