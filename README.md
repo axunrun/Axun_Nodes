@@ -181,13 +181,12 @@ axun_nodes/
 ### 1. 批量超分工作流
 ```mermaid
 graph LR
-    A[Path Processor] --> B[SUPIR Model Loader]
-    B --> C[SUPIR Encode]
-    C --> D[SUPIR First Stage]
-    D --> E[SUPIR Conditioner]
-    E --> F[SUPIR Sample]
-    F --> G[SUPIR Decode]
-    G --> H[Save Image]
+    A[SUPIR Model Loader] --> B[SUPIR Encode]
+    B --> C[SUPIR First Stage]
+    C --> D[SUPIR Conditioner]
+    D --> E[SUPIR Sample]
+    E --> F[SUPIR Decode]
+    F --> G[Save Image]
 ```
 
 ### 2. Lotus深度预测工作流
@@ -201,9 +200,9 @@ graph LR
 ### 3. 批量处理工作流
 ```mermaid
 graph LR
-    A[Directory Picker] --> B[Path Processor]
-    B --> C[Queue Trigger]
-    C --> D[Work Mode]
+    A[Directory Picker] --> C[Path Processor]
+    B[Work Mode] --> C
+    C --> D[Queue Trigger]
     D --> E[Process Node]
 ```
 
