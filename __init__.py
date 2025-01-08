@@ -64,6 +64,9 @@ from .nodes.Supir.supir_model_loader import SUPIR_model_loader
 # 翻译功能相关导入
 from .nodes.Translator.translator_node import TranslatorNode
 
+# 导入 Lotus 节点
+from .nodes.Lotus.lotus_nodes import LoadLotusModel, LotusSampler
+
 # Web目录
 WEB_DIRECTORY = os.path.join(os.path.dirname(__file__), "web")
 
@@ -80,7 +83,10 @@ NODE_CLASS_MAPPINGS = {
     "SUPIR_decode": SUPIR_decode,
     "SUPIR_conditioner": SUPIR_conditioner,
     "SUPIR_model_loader": SUPIR_model_loader,
-    "TranslatorNode": TranslatorNode
+    "TranslatorNode": TranslatorNode,
+    # Lotus 节点
+    "LoadLotusModel": LoadLotusModel,
+    "LotusSampler": LotusSampler
 }
 
 # 节点显示名称映射
@@ -96,7 +102,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SUPIR_decode": "SUPIR Decode",
     "SUPIR_conditioner": "SUPIR Conditioner",
     "SUPIR_model_loader": "SUPIR Model Loader",
-    "TranslatorNode": "Translator"
+    "TranslatorNode": "Translator",
+    # Lotus 节点
+    "LoadLotusModel": "Load Lotus Model",
+    "LotusSampler": "Lotus Sampler"
 }
 
 # 读取配置文件
@@ -169,4 +178,4 @@ async def translate_text(request):
 print(f"\033[92mTranslator Plugin loaded.\033[0m")
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'dir_api']
-VERSION = "1.01"  # 更新版本号
+VERSION = "1.02"  # 更新版本号

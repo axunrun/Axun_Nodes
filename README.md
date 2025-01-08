@@ -1,4 +1,4 @@
-# Axun Nodes - ComfyUI 插件 v1.01
+# Axun Nodes - ComfyUI 插件 v1.02
 
 Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发、SUPIR超分和翻译功能。
 
@@ -18,6 +18,8 @@ axun_nodes/
 │   │   ├── supir_first_stage.py # 第一阶段处理节点
 │   │   ├── supir_conditioner.py # 条件控制节点
 │   │   └── supir_model_loader.py # 模型加载器
+│   ├── Lotus/          # Lotus深度/法线预测节点
+│   │   └── lotus_nodes.py # Lotus节点实现
 │   └── Translator/     # 翻译功能节点
 │       └── translator_node.py # 翻译节点
 ├── web/                 # 前端实现
@@ -70,6 +72,17 @@ axun_nodes/
   - 模型加载和管理
   - 支持高性能和低内存模式
 
+### Lotus 分组
+- 模型加载器 (Load Lotus Model)
+  - 加载 Lotus 深度/法线预测模型
+  - 支持 fp16/fp32 精度选择
+  - 自动通道数适配
+- 采样器节点 (Lotus Sampler)
+  - 深度/法线图预测
+  - 批量处理支持
+  - 内存优化管理
+  - 进度显示功能
+
 ### Translator 分组
 - 翻译节点 (Translator)
   - 双击翻译功能
@@ -115,6 +128,15 @@ axun_nodes/
 | SUPIR Conditioner | prompt | 提示词 |
 | | clip_skip | CLIP跳过层数 |
 
+### Lotus 节点
+| 节点名称 | 主要参数 | 说明 |
+|---------|---------|------|
+| Load Lotus Model | model | 模型文件名 |
+| | precision | 精度选择(fp16/fp32) |
+| Lotus Sampler | seed | 随机种子 |
+| | per_batch | 批处理大小 |
+| | keep_model_loaded | 保持模型加载状态 |
+
 ### 翻译功能配置
 | 配置项 | 说明 | 默认值 |
 |-------|------|--------|
@@ -138,10 +160,13 @@ axun_nodes/
 4. 下载 SUPIR 模型：
    - 从 [Hugging Face](https://huggingface.co/camenduru/SUPIR) 下载模型文件
    - 将模型文件放置在 `ComfyUI/models/supir` 目录下
-5. 配置翻译功能（可选）：
+5. 下载 Lotus 模型：
+   - 从 [Hugging Face](https://huggingface.co/Kijai/lotus-comfyui/tree/main) 下载模型文件
+   - 将模型文件放置在 `ComfyUI/models/diffusion_models` 目录下
+6. 配置翻译功能（可选）：
    - 编辑 `config/translator.json` 文件
    - 填入百度翻译API密钥（已预设可用密钥）
-6. 重启ComfyUI
+7. 重启ComfyUI
 
 ## 使用说明
 
@@ -176,6 +201,15 @@ axun_nodes/
 3. 设置相应参数
 4. 运行工作流进行超分处理
 
+### Lotus 深度/法线预测工作流
+1. 添加 "Load Lotus Model" 节点并加载模型
+2. 连接 "Lotus Sampler" 节点
+3. 设置采样参数：
+   - 调整批处理大小
+   - 设置随机种子
+   - 选择是否保持模型加载
+4. 运行工作流进行深度/法线图预测
+
 ### 翻译功能
 1. 在任意文本输入框中输入文字
 2. 双击输入框触发翻译
@@ -186,6 +220,14 @@ axun_nodes/
 5. 如遇到错误，请查看浏览器控制台
 
 ## 更新日志
+
+### v1.02 (2024-01-08)
+- 集成 Lotus 深度/法线预测功能
+  - 从 ComfyUI-Lotus 项目移植
+  - 优化代码结构和错误处理
+  - 统一配置文件管理
+  - 完善中文文档
+  - 遵循项目命名规范
 
 ### v1.01 (2024-01-08)
 - 新增翻译功能
