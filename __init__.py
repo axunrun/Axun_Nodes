@@ -9,16 +9,31 @@ import requests
 from aiohttp import web
 from server import PromptServer
 
-# 配置日志
+#######################
+# 全局工具函数
+#######################
+
 def setup_logging():
-    """配置日志系统"""
+    """
+    配置日志系统
+    来源：全局需求
+    用途：为所有节点提供日志支持
+    """
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
+#######################
+# Qtools 工具函数
+#######################
+
 def install_tkinter():
-    """安装tkinter"""
+    """
+    安装tkinter
+    来源：Qtools 节点组
+    用途：为 DirPicker 提供目录选择界面支持
+    """
     try:
         importlib.import_module('tkinter')
     except ImportError:
@@ -86,7 +101,7 @@ NODE_CLASS_MAPPINGS = {
     "TranslatorNode": TranslatorNode,
     # Lotus 节点
     "LoadLotusModel": LoadLotusModel,
-    "LotusSampler": LotusSampler
+    "LotusSampler": LotusSampler,
 }
 
 # 节点显示名称映射
@@ -105,11 +120,16 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TranslatorNode": "Translator",
     # Lotus 节点
     "LoadLotusModel": "Load Lotus Model",
-    "LotusSampler": "Lotus Sampler"
+    "LotusSampler": "Lotus Sampler",
 }
 
 # 读取配置文件
 def load_translator_config():
+    """
+    读取翻译器配置
+    来源：Translator 节点组
+    用途：加载百度翻译 API 配置
+    """
     config_path = os.path.join(os.path.dirname(__file__), "config", "translator.json")
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
@@ -118,14 +138,22 @@ def load_translator_config():
         return {"baidu_api": {"appid": "", "key": ""}}
 
 def is_chinese(text):
-    """检查文本是否包含中文"""
+    """
+    检查文本是否包含中文
+    来源：Translator 节点组
+    用途：判断文本语言类型
+    """
     for char in text:
         if '\u4e00' <= char <= '\u9fff':
             return True
     return False
 
 async def translate_with_baidu(text, appid, key, from_lang, to_lang):
-    """使用百度翻译API进行翻译"""
+    """
+    使用百度翻译API进行翻译
+    来源：Translator 节点组
+    用途：调用百度翻译 API
+    """
     url = "https://api.fanyi.baidu.com/api/trans/vip/translate"
     salt = str(random.randint(32768, 65536))
     sign = hashlib.md5((appid + text + salt + key).encode()).hexdigest()
@@ -153,19 +181,22 @@ async def translate_with_baidu(text, appid, key, from_lang, to_lang):
 # 注册翻译API路由
 @PromptServer.instance.routes.post('/translator/translate')
 async def translate_text(request):
+    """
+    翻译 API 路由处理
+    来源：Translator 节点组
+    用途：提供翻译 API 路由
+    """
     try:
         data = await request.json()
         text = data.get("text", "")
         config = load_translator_config()
         
-        # 获取API密钥
         appid = config["baidu_api"]["appid"]
         key = config["baidu_api"]["key"]
         
         if not text or not appid or not key:
             return web.json_response({"error": "Missing required parameters"}, status=400)
         
-        # 检测语言并翻译
         if is_chinese(text):
             translated = await translate_with_baidu(text, appid, key, 'zh', 'en')
         else:
