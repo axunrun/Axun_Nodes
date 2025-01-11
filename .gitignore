@@ -20,43 +20,30 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
-venv/
-env/
-ENV/
-
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.vs/
-*.sublime-workspace
-*.sublime-project
-.clinerules
-.cursorrules
 
-# Logs
-*.log
-logs/
-log/
-
-# Local development
+# 环境
 .env
-.env.local
-.env.*.local
-*.db
-*.sqlite3
+.venv
+env/
+venv/
+ENV/
 
-# Node specific
-node_modules/
-package-lock.json
+# 日志
+*.log
 
-# System
+# 配置文件
+config/*.json
+!config/lotus_unet_config.json
+
+# 学习和测试目录
+learn/
+tests/
+
+# 其他
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# Custom folders
-custom_nodes/
-custom_workflows/ 
+Thumbs.db 

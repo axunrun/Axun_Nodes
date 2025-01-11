@@ -1,7 +1,17 @@
+import { api } from '../../../scripts/api.js';
 import { app } from '../../../scripts/app.js';
+
+/**
+ * 全局状态管理
+ */
+const state = {
+    hasTk: false,    // 标记是否有翻译API的token/密钥
+    isUpdating: false // 标记是否正在进行更新操作
+};
 
 async function translateText(text) {
     try {
+        console.log("[Translator] 发送翻译请求:", text);
         const response = await fetch("/translator/translate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -16,14 +26,14 @@ async function translateText(text) {
         if (result.error) {
             throw new Error(result.error);
         }
+        console.log("[Translator] 翻译结果:", result.translated);
         return result.translated;
     } catch (error) {
-        console.error("Translation failed:", error);
+        console.error("[Translator] 翻译失败:", error);
         return null;
     }
 }
 
-// 防抖函数
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -36,14 +46,23 @@ function debounce(func, wait) {
     };
 }
 
-// 监听文本框双击事件
 function setupTranslator() {
+    console.log("[Translator] 开始设置翻译器...");
+    
+    // 立即处理已存在的文本框
+    document.querySelectorAll('.comfy-multiline-input, .lg-input').forEach(textarea => {
+        console.log("[Translator] 发现现有文本框，设置事件");
+        setupTextAreaEvents(textarea);
+    });
+    
+    // 监听新添加的文本框
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (node.classList && 
                     (node.classList.contains("comfy-multiline-input") || 
                      node.classList.contains("lg-input"))) {
+                    console.log("[Translator] 发现新文本框，设置事件");
                     setupTextAreaEvents(node);
                 }
             });
@@ -51,30 +70,35 @@ function setupTranslator() {
     });
     
     observer.observe(document.body, { childList: true, subtree: true });
+    console.log("[Translator] 观察器已启动");
 }
 
-// 设置文本框事件
 function setupTextAreaEvents(textarea) {
     const handleTranslation = async () => {
         const text = textarea.value;
         if (!text) return;
         
+        console.log("[Translator] 检测到双击，开始翻译");
         const translated = await translateText(text);
         if (translated) {
             textarea.value = translated;
-            // 触发ComfyUI的更新
-            textarea.dispatchEvent(new Event("input"));
+            // 触发input事件，确保UI更新
+            const event = new Event('input', { bubbles: true });
+            textarea.dispatchEvent(event);
+            // 同时触发change事件
+            const changeEvent = new Event('change', { bubbles: true });
+            textarea.dispatchEvent(changeEvent);
         }
     };
 
-    // 使用防抖处理双击事件
     const debouncedTranslation = debounce(handleTranslation, 300);
     
     textarea.addEventListener("dblclick", (e) => {
+        console.log("[Translator] 捕获到双击事件");
         e.preventDefault();
         debouncedTranslation();
     });
 }
 
-// 初始化
+// 直接初始化
 setupTranslator(); 

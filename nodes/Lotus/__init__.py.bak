@@ -1,0 +1,20 @@
+"""
+Lotus 节点组
+提供 Lotus 模型加载和采样功能
+"""
+
+from .lotus_nodes import LoadLotusModel, LotusSampler
+
+NODE_CLASS_MAPPINGS = {
+    "LoadLotusModel": LoadLotusModel,
+    "LotusSampler": LotusSampler,
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "LoadLotusModel": "Load Lotus Model",
+    "LotusSampler": "Lotus Sampler",
+}
+
+print("\033[94mLotus Plugin loaded.\033[0m")
+
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 

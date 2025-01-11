@@ -1,0 +1,61 @@
+"""
+Queue Tools 节点组
+提供批量处理工具集
+"""
+
+import importlib.util
+import sys
+import platform
+import subprocess
+
+def install_tkinter():
+    """安装tkinter依赖"""
+    try:
+        importlib.import_module('tkinter')
+    except ImportError:
+        print("[AxunNodes] 正在尝试安装tkinter")
+        try:
+            system = platform.system()
+            if system == 'Darwin':
+                result = subprocess.run(['brew', 'install', 'python-tk'], check=True)
+                if result.returncode != 0:
+                    raise Exception("Brew安装失败，请确保已安装brew (https://brew.sh/)")
+            elif system == 'Linux':
+                result = subprocess.run(['sudo', 'apt', '-y', 'install', 'python3-tk'], check=True)
+                if result.returncode != 0:
+                    raise Exception("Apt安装失败")
+            else:
+                result = subprocess.run([sys.executable, '-m', 'pip', 'install', 'tk'], check=True)
+                if result.returncode != 0:
+                    raise Exception("Pip安装失败")
+        except Exception as e:
+            print("[AxunNodes] 无法安装tkinter，请尝试设置TCL_LIBRARY和TK_LIBRARY环境变量")
+            print(e)
+
+# 确保tkinter已安装
+install_tkinter()
+
+from .dir_picker import DirPicker
+from .path_processor import PathProcessor
+from .queue_trigger import ImpactQueueTriggerCountdown
+from .work_mode import WorkMode
+
+# 节点类映射
+NODE_CLASS_MAPPINGS = {
+    "axun_nodes_DirPicker": DirPicker,
+    "axun_nodes_PathProcessor": PathProcessor,
+    "axun_nodes_QueueTrigger": ImpactQueueTriggerCountdown,
+    "axun_nodes_WorkMode": WorkMode,
+}
+
+# 节点显示名称映射
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "axun_nodes_DirPicker": "Directory Picker",
+    "axun_nodes_PathProcessor": "Path Processor",
+    "axun_nodes_QueueTrigger": "Queue Trigger",
+    "axun_nodes_WorkMode": "Work Mode",
+}
+
+print("\033[94mQueue Tools Plugin loaded.\033[0m")
+
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 

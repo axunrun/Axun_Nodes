@@ -2,35 +2,134 @@
 
 Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发、SUPIR超分和翻译功能。
 
-## 项目结构
+## 项目结构说明
+
+本项目采用以下目录结构进行代码组织:
+
 ```
 axun_nodes/
-├── nodes/               # 节点实现
-│   ├── Qtools/         # 队列工具节点
-│   │   ├── path_processor.py # 路径处理节点
-│   │   ├── queue_trigger.py # 队列触发节点
-│   │   ├── work_mode.py    # 工作模式节点
-│   │   └── dir_picker.py   # 目录选择器节点
-│   ├── Supir/          # SUPIR超分节点
-│   │   ├── supir_sample.py      # 采样器节点
-│   │   ├── supir_encode.py      # 编码器节点
-│   │   ├── supir_decode.py      # 解码器节点
-│   │   ├── supir_first_stage.py # 第一阶段处理节点
-│   │   ├── supir_conditioner.py # 条件控制节点
-│   │   └── supir_model_loader.py # 模型加载器
-│   ├── Lotus/          # Lotus深度/法线预测节点
-│   │   └── lotus_nodes.py # Lotus节点实现
-│   └── Translator/     # 翻译功能节点
-│       └── translator_node.py # 翻译节点
-├── web/                 # 前端实现
-│   └── js/
-│       ├── web.js       # 前端交互脚本
-│       └── translator.js # 翻译功能脚本
-├── config/             # 配置文件目录
-│   └── translator.json  # 翻译API配置
-├── __init__.py         # 插件初始化和节点注册
-└── README.md           # 项目说明文档
+├── nodes/                  # 节点实现目录
+│   ├── AIAssistant/       # AI助手节点
+│   │   ├── __init__.py.bak  # 备份的初始化文件
+│   │   └── llm_node.py      # LLM节点实现(350行)
+│   ├── Qtools/            # 队列工具节点
+│   │   ├── __init__.py.bak  # 备份的初始化文件
+│   │   ├── dir_picker.py    # 目录选择节点(162行)
+│   │   ├── path_processor.py # 路径处理节点(198行)
+│   │   ├── queue_trigger.py  # 队列触发节点(143行)
+│   │   └── work_mode.py     # 工作模式节点(32行)
+│   ├── Supir/             # SUPIR超分节点
+│   │   ├── CKPT_PTH.py      # 模型路径配置
+│   │   ├── configs/         # 配置文件目录
+│   │   ├── options/         # 选项配置目录
+│   │   ├── sgm/            # SGM模型核心
+│   │   │   ├── models/     # 模型定义
+│   │   │   │   ├── autoencoder.py  # 自编码器(338行)
+│   │   │   │   ├── diffusion.py    # 扩散模型(323行)
+│   │   │   │   └── __init__.py
+│   │   │   ├── modules/    # 模块组件
+│   │   │   │   ├── attention.py       # 注意力机制(639行)
+│   │   │   │   ├── autoencoding/      # 自编码相关
+│   │   │   │   ├── diffusionmodules/  # 扩散模块
+│   │   │   │   ├── distributions/     # 分布函数
+│   │   │   │   ├── ema.py            # 指数移动平均(87行)
+│   │   │   │   ├── encoders/         # 编码器
+│   │   │   │   └── __init__.py
+│   │   │   ├── util.py      # 工具函数(251行)
+│   │   │   └── __init__.py
+│   │   ├── supir_conditioner.py  # 条件控制器(122行)
+│   │   ├── supir_decode.py       # 解码器(77行)
+│   │   ├── supir_encode.py       # 编码器(95行)
+│   │   ├── supir_first_stage.py  # 第一阶段(117行)
+│   │   ├── supir_model_loader.py # 模型加载器(269行)
+│   │   ├── supir_sample.py       # 采样器(186行)
+│   │   └── __init__.py.bak
+│   ├── Lotus/             # Lotus深度/法线预测节点
+│   │   ├── lotus_nodes.py   # Lotus节点实现(151行)
+│   │   └── __init__.py.bak
+│   └── Translator/        # 翻译功能节点
+│       ├── translator_node.py # 翻译节点实现(86行)
+│       ├── utils/            # 翻译工具
+│       └── __init__.py.bak
+├── utils/                 # 工具函数目录
+│   ├── api_handler.py     # API处理器(483行)
+│   ├── config_utils.py    # 配置工具(146行)
+│   ├── image_utils.py     # 图像处理工具(53行)
+│   ├── route_handlers.py  # 路由处理器(114行)
+│   ├── system_utils.py    # 系统工具(64行)
+│   ├── web_utils.py       # Web工具(33行)
+│   └── utils.py           # 通用工具函数(58行)
+├── web/                   # 前端代码目录
+│   ├── qtools.js          # 队列工具前端功能(176行)
+│   ├── translator.js      # 翻译功能(104行)
+│   └── llm.js             # LLM相关功能(413行)
+├── config/                # 配置文件目录
+│   ├── axun_nodes.json    # 插件主配置(194行)
+│   ├── dir_picker.json    # 目录选择器配置(1行)
+│   ├── llm_config.json    # LLM配置(56行)
+│   ├── lotus_nodes.json   # Lotus节点配置(73行)
+│   ├── translator.json    # 翻译API配置(6行)
+│   └── empty_text_embed.pt # 空文本嵌入模型
+├── __init__.py            # 插件初始化和节点注册(139行)
+└── README.md              # 项目说明文档(578行)
 ```
+
+### 代码量统计
+- 总代码行数：约4000行
+- 核心功能代码：约2500行
+- 配置文件：约330行
+- 前端代码：约700行
+- 文档：约600行
+
+### 模块分析
+1. **SUPIR模块**
+   - 最复杂的模块，包含完整的SGM（Score-based Generative Model）实现
+   - 核心代码在sgm目录下，包括自编码器、扩散模型和各种神经网络组件
+   - 代码结构层次分明，模块化程度高
+
+2. **Qtools模块**
+   - 工具类节点集合，主要处理文件和队列操作
+   - 代码相对独立，每个节点功能单一明确
+   - 与前端交互较多，需要配合qtools.js使用
+
+3. **AI助手模块**
+   - 集中在单个llm_node.py文件中
+   - 代码量较大但结构清晰
+   - 主要处理API调用和响应处理
+
+4. **Lotus模块**
+   - 代码相对简单，主要是模型加载和推理
+   - 与ComfyUI原生接口集成度高
+
+5. **翻译模块**
+   - 轻量级实现，主要是API调用
+   - 前端交互较多，需要配合translator.js
+
+6. **工具类模块**
+   - utils目录下的工具函数覆盖面广
+   - api_handler.py是最大的工具文件，处理所有API相关操作
+   - 配置和路由处理逻辑分离良好
+
+### 代码质量分析
+1. **模块化程度**
+   - 各功能模块独立性强
+   - 代码复用程度高
+   - 接口定义清晰
+
+2. **可维护性**
+   - 文件组织结构合理
+   - 代码注释充分
+   - 配置与代码分离
+
+3. **扩展性**
+   - 插件架构设计良好
+   - 新功能可以方便地添加
+   - 配置系统灵活
+
+4. **文档完整性**
+   - README文档详尽
+   - 代码内注释充分
+   - 配置文件有说明
 
 ## 功能节点说明
 
@@ -175,6 +274,199 @@ axun_nodes/
 **配置参数：**
 - `appid` (STRING): 百度翻译API的APPID
 - `key` (STRING): 百度翻译API的密钥
+
+### LLM 分组
+
+#### LLM Assistant (AI助手节点)
+**输入参数：**
+- `provider` (COMBO): 服务提供商选择 [Silicon Cloud LLM, Silicon Cloud VLM, Deepseek]
+- `model` (COMBO): 模型选择（动态获取可用模型列表）
+- `scene` (COMBO): 场景选择 [代码生成, 数学解题, 数据分析, 通用对话, 翻译, 创意写作]
+- `system_prompt` (STRING): 系统提示词
+- `user_prompt` (STRING): 用户提示词
+- `temperature` (FLOAT): 温度参数 [0.0-2.0]
+- `top_p` (FLOAT): 采样范围 [0-1.0]
+- `max_tokens` (INT): 最大生成长度
+- `image` (IMAGE): 图片输入 (仅VLM模式可用)
+- `detail` (BOOLEAN): 详细分析 (仅VLM模式可用)
+
+**功能特点：**
+1. 多提供商支持
+   - Silicon Cloud LLM: 文本对话
+   - Silicon Cloud VLM: 图文理解
+   - Deepseek: 文本对话
+
+2. 场景预设
+   - 每个场景都有针对不同提供商优化的参数配置
+   - 切换场景时自动更新相关参数
+   - 支持手动调整参数
+
+3. API管理
+   - 支持在界面设置和验证API密钥
+   - 自动检测API密钥有效性
+   - 配置文件存储API密钥
+
+**开发进度：**
+- [x] 基础框架搭建
+- [x] 多提供商支持
+- [x] 场景预设功能
+- [x] API密钥管理
+- [x] 参数动态调整
+- [ ] 图片输入功能
+- [ ] 详细分析开关
+- [ ] 错误处理优化
+- [ ] 界面美化
+
+**配置文件：**
+在 `config/llm_config.json` 中可以设置：
+```json
+{
+    "silicon_cloud": {
+        "api_key": "",
+        "base_url": "https://api.siliconflow.cn/v1"
+    },
+    "deepseek": {
+        "api_key": "",
+        "base_url": "https://api.deepseek.com/v1"
+    },
+    "parameters": {
+        "presets": {
+            "通用": {
+                "temperature": 0.7,
+                "top_p": 0.9
+            },
+            "创意": {
+                "temperature": 1.0,
+                "top_p": 0.95
+            },
+            "精确": {
+                "temperature": 0.3,
+                "top_p": 0.8
+            }
+        }
+    }
+}
+```
+
+**使用说明：**
+1. 首次使用配置：
+   - 编辑 `config/llm_config.json`
+   - 填入相应服务商的API密钥
+   - 可选调整参数预设
+
+2. 基本使用：
+   - 选择服务提供商
+   - 选择模型
+   - 设置系统提示词（可选）
+   - 输入用户提示词
+   - 调整生成参数（可选）
+
+3. 参数调优：
+   - temperature越高，生成内容越随机创意
+   - temperature越低，生成内容越稳定精确
+   - max_tokens决定生成内容的最大长度
+
+4. 错误处理：
+   - 自动重试API请求
+   - 详细的错误日志
+   - 友好的错误提示
+
+**工作流示例：**
+```mermaid
+graph LR
+    A[Text Input] --> B[LLM Assistant]
+    B --> C[Text Output]
+    B --> D[Save Response]
+```
+
+**注意事项：**
+- 需要有效的API密钥
+- 需要稳定的网络连接
+- 注意API使用配额
+- 建议根据需求调整参数
+- 系统提示词对生成质量有重要影响
+
+### DeepseekChat 分组
+
+#### Deepseek Chat (AI对话节点)
+**输入参数：**
+- `prompt` (STRING): 要发送给AI的文本内容
+- `image_path` (STRING): 要上传的图片路径（可选）
+- `mode` (COMBO): 对话模式 [chat, image_upload]
+- `new_conversation` (BOOLEAN): 是否开始新对话
+- `email` (STRING, 可选): Deepseek账号邮箱
+- `password` (STRING, 可选): Deepseek账号密码
+- `system_prompt` (STRING, 可选): 系统提示词，用于设置对话上下文
+
+**输出：**
+- `response` (STRING): AI的回复内容
+- `conversation_id` (STRING): 当前会话ID
+
+**功能特点：**
+- 支持文本对话和图片上传
+- 自动登录和会话管理
+- 支持系统提示词设置
+- 智能等待AI回复
+- 自动重试机制
+- 会话历史记录
+- 配置文件支持
+
+**配置文件：**
+在 `config/deepseek_config.json` 中可以设置：
+```json
+{
+    "credentials": {
+        "email": "",
+        "password": ""
+    },
+    "browser_settings": {
+        "headless": true,
+        "timeout": 30,
+        "retry_attempts": 3
+    },
+    "chat_settings": {
+        "max_retries": 3,
+        "retry_delay": 5,
+        "response_timeout": 60
+    }
+}
+```
+
+**使用说明：**
+1. 首次使用配置：
+   - 编辑 `config/deepseek_config.json`
+   - 填入Deepseek账号信息（可选）
+   - 调整浏览器和对话设置（可选）
+
+2. 文本对话模式：
+   - 输入提示文本
+   - 设置 `new_conversation` 决定是否开始新对话
+   - 可选设置系统提示词
+
+3. 图片上传模式：
+   - 设置图片路径
+   - 选择 `image_upload` 模式
+   - 输入相关提示文本
+
+4. 会话管理：
+   - 使用 `conversation_id` 跟踪对话
+   - 可以在多个节点间共享会话
+
+**注意事项：**
+- 需要安装Chrome浏览器
+- 需要稳定的网络连接
+- 建议在使用完毕后关闭节点以释放资源
+- 账号信息优先使用节点输入，其次使用配置文件
+- 超时和重试参数可在配置文件中调整
+
+**工作流示例：**
+```mermaid
+graph LR
+    A[Text Input] --> B[Deepseek Chat]
+    C[Image Load] --> B
+    B --> D[Text Output]
+    B --> E[Save Response]
+```
 
 ## 工作流示例
 

@@ -1,0 +1,35 @@
+"""
+SUPIR 节点组
+提供图像超分辨率处理功能
+"""
+
+from .supir_sample import SUPIR_sample
+from .supir_first_stage import SUPIR_first_stage
+from .supir_encode import SUPIR_encode
+from .supir_decode import SUPIR_decode
+from .supir_conditioner import SUPIR_conditioner
+from .supir_model_loader import SUPIR_model_loader
+
+# 节点类映射
+NODE_CLASS_MAPPINGS = {
+    "SUPIR_sample": SUPIR_sample,
+    "SUPIR_first_stage": SUPIR_first_stage,
+    "SUPIR_encode": SUPIR_encode,
+    "SUPIR_decode": SUPIR_decode,
+    "SUPIR_conditioner": SUPIR_conditioner,
+    "SUPIR_model_loader": SUPIR_model_loader,
+}
+
+# 节点显示名称映射
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "SUPIR_sample": "SUPIR Sampler",
+    "SUPIR_first_stage": "SUPIR First Stage (Denoiser)",
+    "SUPIR_encode": "SUPIR Encode",
+    "SUPIR_decode": "SUPIR Decode",
+    "SUPIR_conditioner": "SUPIR Conditioner",
+    "SUPIR_model_loader": "SUPIR Model Loader",
+}
+
+print("\033[94mSUPIR Plugin loaded.\033[0m")
+
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 

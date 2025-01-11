@@ -1,14 +1,5 @@
 import { api } from '../../../scripts/api.js';
 import { app } from '../../../scripts/app.js';
-import "./translator.js";
-
-/**
- * 全局状态管理
- */
-const state = {
-    hasTk: false,
-    isUpdating: false
-};
 
 /**
  * API请求工具类

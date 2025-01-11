@@ -18,7 +18,8 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 def save_picked_dirs():
     """保存已选择的目录"""
     try:
-        with open(os.path.join(current_path, 'picked_dirs.json'), 'w') as f:
+        config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "config", "dir_picker.json")
+        with open(config_path, 'w') as f:
             json.dump(picked_dirs, f)
     except Exception as e:
         logger.error(f"保存目录失败: {str(e)}")
@@ -26,9 +27,9 @@ def save_picked_dirs():
 def load_picked_dirs():
     """加载已保存的目录"""
     try:
-        path = os.path.join(current_path, 'picked_dirs.json')
-        if os.path.exists(path):
-            with open(path, 'r') as f:
+        config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "config", "dir_picker.json")
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
                 picked_dirs.update(json.load(f))
     except Exception as e:
         logger.error(f"加载目录失败: {str(e)}")

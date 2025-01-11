@@ -11,10 +11,9 @@ from diffusers.models import UNet2DConditionModel
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger(__name__)
 
-script_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 def get_config_path(filename):
     """获取配置文件的完整路径并验证文件存在"""
+    script_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     config_path = os.path.join(script_directory, "config", filename)
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"配置文件 {filename} 不存在于路径: {config_path}")
@@ -50,7 +49,7 @@ class LoadLotusModel:
             in_channels = lotus_sd['conv_in.weight'].shape[1]
             
             # 获取并验证配置文件路径
-            lotus_config = get_config_path("lotus_unet_config.json")
+            lotus_config = get_config_path("lotus_nodes.json")
 
             with open(lotus_config, 'r') as config_file:
                config_data = json.load(config_file)

@@ -1,46 +1,29 @@
-import importlib.util
-import sys
-import logging
+# 版本信息
+VERSION = "1.02"
+
 import os
+import sys
 import json
-import hashlib
-import random
-import requests
+import platform
+import subprocess
+import importlib
+from typing import Dict, Any
 from aiohttp import web
 from server import PromptServer
 
-#######################
-# 全局工具函数
-#######################
-
-def setup_logging():
-    """
-    配置日志系统
-    来源：全局需求
-    用途：为所有节点提供日志支持
-    """
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+# Web目录定义
+WEB_DIRECTORY = "./web"
 
 #######################
-# Qtools 工具函数
+# Qtools 节点组
 #######################
-
 def install_tkinter():
-    """
-    安装tkinter
-    来源：Qtools 节点组
-    用途：为 DirPicker 提供目录选择界面支持
-    """
+    """安装tkinter依赖"""
     try:
         importlib.import_module('tkinter')
     except ImportError:
         print("[AxunNodes] 正在尝试安装tkinter")
         try:
-            import subprocess
-            import platform
             system = platform.system()
             if system == 'Darwin':
                 result = subprocess.run(['brew', 'install', 'python-tk'], check=True)
@@ -58,17 +41,29 @@ def install_tkinter():
             print("[AxunNodes] 无法安装tkinter，请尝试设置TCL_LIBRARY和TK_LIBRARY环境变量")
             print(e)
 
-# 初始化
-setup_logging()
+# 确保tkinter已安装
 install_tkinter()
 
-# 导入节点
+#######################
+# 导入所有节点
+#######################
+
+# Qtools节点组
+from .nodes.Qtools.dir_picker import DirPicker
 from .nodes.Qtools.path_processor import PathProcessor
 from .nodes.Qtools.queue_trigger import ImpactQueueTriggerCountdown
 from .nodes.Qtools.work_mode import WorkMode
-from .nodes.Qtools.dir_picker import DirPicker, dir_api
 
-# 导入 SUPIR 节点
+# AI助手节点组 - 暂未完成
+# from .nodes.AIAssistant.llm_node import LLMNode
+
+# 翻译节点组
+from .nodes.Translator.translator_node import TranslatorNode
+
+# Lotus节点组
+from .nodes.Lotus.lotus_nodes import LoadLotusModel, LotusSampler
+
+# SUPIR节点组
 from .nodes.Supir.supir_sample import SUPIR_sample
 from .nodes.Supir.supir_first_stage import SUPIR_first_stage
 from .nodes.Supir.supir_encode import SUPIR_encode
@@ -76,137 +71,69 @@ from .nodes.Supir.supir_decode import SUPIR_decode
 from .nodes.Supir.supir_conditioner import SUPIR_conditioner
 from .nodes.Supir.supir_model_loader import SUPIR_model_loader
 
-# 翻译功能相关导入
-from .nodes.Translator.translator_node import TranslatorNode
-
-# 导入 Lotus 节点
-from .nodes.Lotus.lotus_nodes import LoadLotusModel, LotusSampler
-
-# Web目录
-WEB_DIRECTORY = os.path.join(os.path.dirname(__file__), "web")
-
+#######################
 # 节点映射
+#######################
+
+# 节点类映射
 NODE_CLASS_MAPPINGS = {
+    # Qtools节点组
+    "axun_nodes_DirPicker": DirPicker,
     "axun_nodes_PathProcessor": PathProcessor,
     "axun_nodes_QueueTrigger": ImpactQueueTriggerCountdown,
     "axun_nodes_WorkMode": WorkMode,
-    "axun_nodes_DirPicker": DirPicker,
-    # SUPIR 节点
+    
+    # AI助手节点组 - 暂未完成
+    # "LLMNode": LLMNode,
+    
+    # 翻译节点组
+    "TranslatorNode": TranslatorNode,
+    
+    # Lotus节点组
+    "LoadLotusModel": LoadLotusModel,
+    "LotusSampler": LotusSampler,
+    
+    # SUPIR节点组
     "SUPIR_sample": SUPIR_sample,
     "SUPIR_first_stage": SUPIR_first_stage,
     "SUPIR_encode": SUPIR_encode,
     "SUPIR_decode": SUPIR_decode,
     "SUPIR_conditioner": SUPIR_conditioner,
     "SUPIR_model_loader": SUPIR_model_loader,
-    "TranslatorNode": TranslatorNode,
-    # Lotus 节点
-    "LoadLotusModel": LoadLotusModel,
-    "LotusSampler": LotusSampler,
 }
 
 # 节点显示名称映射
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "axun_nodes_PathProcessor": "Path Processor",
-    "axun_nodes_QueueTrigger": "Queue Trigger",
-    "axun_nodes_WorkMode": "Work Mode",
-    "axun_nodes_DirPicker": "Directory Picker",
-    # SUPIR 节点
-    "SUPIR_sample": "SUPIR Sampler",
-    "SUPIR_first_stage": "SUPIR First Stage (Denoiser)",
-    "SUPIR_encode": "SUPIR Encode",
-    "SUPIR_decode": "SUPIR Decode",
-    "SUPIR_conditioner": "SUPIR Conditioner",
-    "SUPIR_model_loader": "SUPIR Model Loader",
-    "TranslatorNode": "Translator",
-    # Lotus 节点
-    "LoadLotusModel": "Load Lotus Model",
-    "LotusSampler": "Lotus Sampler",
+    # Qtools节点组
+    "axun_nodes_DirPicker": "📁 Directory Picker",
+    "axun_nodes_PathProcessor": "🔍 Path Processor",
+    "axun_nodes_QueueTrigger": "⏱️ Queue Trigger",
+    "axun_nodes_WorkMode": "⚙️ Work Mode",
+    
+    # AI助手节点组 - 暂未完成
+    # "LLMNode": "🤖 LLM Assistant",
+    
+    # 翻译节点组
+    "TranslatorNode": "🌐 Translator",
+    
+    # Lotus节点组
+    "LoadLotusModel": "🧠 Load Lotus Model",
+    "LotusSampler": "✨ Lotus Sampler",
+    
+    # SUPIR节点组
+    "SUPIR_sample": "🎨 SUPIR Sampler",
+    "SUPIR_first_stage": "🖼️ SUPIR First Stage",
+    "SUPIR_encode": "📥 SUPIR Encode",
+    "SUPIR_decode": "📤 SUPIR Decode",
+    "SUPIR_conditioner": "🔧 SUPIR Conditioner",
+    "SUPIR_model_loader": "💾 SUPIR Model Loader",
 }
 
-# 读取配置文件
-def load_translator_config():
-    """
-    读取翻译器配置
-    来源：Translator 节点组
-    用途：加载百度翻译 API 配置
-    """
-    config_path = os.path.join(os.path.dirname(__file__), "config", "translator.json")
-    try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except:
-        return {"baidu_api": {"appid": "", "key": ""}}
+#######################
+# 初始化完成
+#######################
 
-def is_chinese(text):
-    """
-    检查文本是否包含中文
-    来源：Translator 节点组
-    用途：判断文本语言类型
-    """
-    for char in text:
-        if '\u4e00' <= char <= '\u9fff':
-            return True
-    return False
+print(f"\033[92mAxun Nodes Plugin v{VERSION} loaded.\033[0m")
 
-async def translate_with_baidu(text, appid, key, from_lang, to_lang):
-    """
-    使用百度翻译API进行翻译
-    来源：Translator 节点组
-    用途：调用百度翻译 API
-    """
-    url = "https://api.fanyi.baidu.com/api/trans/vip/translate"
-    salt = str(random.randint(32768, 65536))
-    sign = hashlib.md5((appid + text + salt + key).encode()).hexdigest()
-    
-    params = {
-        'appid': appid,
-        'q': text,
-        'from': from_lang,
-        'to': to_lang,
-        'salt': salt,
-        'sign': sign
-    }
-    
-    try:
-        response = requests.get(url, params=params)
-        result = response.json()
-        
-        if 'trans_result' in result:
-            return result['trans_result'][0]['dst']
-        else:
-            raise Exception(f"Translation error: {result.get('error_msg', 'Unknown error')}")
-    except Exception as e:
-        raise Exception(f"Translation failed: {str(e)}")
-
-# 注册翻译API路由
-@PromptServer.instance.routes.post('/translator/translate')
-async def translate_text(request):
-    """
-    翻译 API 路由处理
-    来源：Translator 节点组
-    用途：提供翻译 API 路由
-    """
-    try:
-        data = await request.json()
-        text = data.get("text", "")
-        config = load_translator_config()
-        
-        appid = config["baidu_api"]["appid"]
-        key = config["baidu_api"]["key"]
-        
-        if not text or not appid or not key:
-            return web.json_response({"error": "Missing required parameters"}, status=400)
-        
-        if is_chinese(text):
-            translated = await translate_with_baidu(text, appid, key, 'zh', 'en')
-        else:
-            translated = await translate_with_baidu(text, appid, key, 'en', 'zh')
-            
-        return web.json_response({"translated": translated})
-    except Exception as e:
-        return web.json_response({"error": str(e)}, status=500)
-
-print(f"\033[92mTranslator Plugin loaded.\033[0m")
-
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'dir_api']
-VERSION = "1.02"  # 更新版本号
+# 导出必要的变量
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

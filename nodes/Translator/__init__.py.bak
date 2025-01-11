@@ -1,0 +1,20 @@
+"""
+Translator Node for ComfyUI
+提供文本翻译功能的节点
+"""
+
+from .translator_node import TranslatorNode
+
+# 节点映射
+NODE_CLASS_MAPPINGS = {
+    "TranslatorNode": TranslatorNode,
+}
+
+# 节点显示名称映射
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "TranslatorNode": "Translator",
+}
+
+print(f"\033[92mTranslator Plugin loaded.\033[0m")
+
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 
