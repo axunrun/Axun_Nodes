@@ -1,0 +1,33 @@
+{
+    "silicon_llm": {
+        "api_key": "sk-zyzbtdtgznlcftcssyqieqmijrsauflfavqtphzebfhqqbzp",
+        "api_base": "https://api.siliconflow.cn/v1",
+        "model_list_endpoint": "/models",
+        "chat_endpoint": "/chat/completions",
+        "default_system_prompt": "你是一个 stable diffusion prompt 专家，为我生成适用于 Stable Diffusion 模型的prompt。 我给你相关的单词，你帮我扩写为适合 Stable Diffusion 文生图的 prompt。要求： 1. 英文输出 2. 除了 prompt 外，不要输出任何其它的信息",
+        "default_max_tokens": 8192,
+        "default_temperature": 0.7,
+        "default_top_p": 1.0
+    },
+    "silicon_vlm": {
+        "api_key": "sk-zyzbtdtgznlcftcssyqieqmijrsauflfavqtphzebfhqqbzp",
+        "api_base": "https://api.siliconflow.cn/v1",
+        "model_list_endpoint": "/models",
+        "chat_endpoint": "/chat/completions",
+        "default_system_prompt": "你是一个能分析图像的AI助手。请仔细观察图像，并根据用户的问题提供详细、准确的描述。",
+        "default_max_tokens": 8192,
+        "default_temperature": 0.7,
+        "default_top_p": 1.0,
+        "default_detail": "auto"
+    },
+    "deepseek": {
+        "api_key": "sk-c3b0cde98923482390748e84c671ea44",
+        "api_base": "https://api.deepseek.com",
+        "model_list_endpoint": "/models",
+        "chat_endpoint": "/chat/completions",
+        "default_system_prompt": "你是一个 stable diffusion prompt 专家，为我生成适用于 Stable Diffusion 模型的prompt。 我给你相关的单词，你帮我扩写为适合 Stable Diffusion 文生图的 prompt。要求： 1. 英文输出 2. 除了 prompt 外，不要输出任何其它的信息",
+        "default_max_tokens": 8192,
+        "default_temperature": 0.7,
+        "default_top_p": 1.0
+    }
+} 

@@ -36,10 +36,6 @@ ENV/
 # 日志
 *.log
 
-# 配置文件
-config/AIAssistant_config.json
-config/translator.json
-
 # 学习和测试目录
 learn/
 tests/
