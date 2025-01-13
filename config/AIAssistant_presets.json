@@ -1,20 +1,143 @@
 {
-    "通用对话": {
-        "system_prompt": "你是一个AI助手，请根据用户的问题提供准确、有帮助的回答。",
-        "user_prompt": "请描述一下...",
-        "temperature": 0.7,
-        "top_p": 0.9
+    "system_presets": {
+        "null": {
+            "system_prompt": "",
+            "temperature": 0.7,
+            "top_p": 0.9
+        },
+        "通用场景": {
+            "system_prompt": "You are an AI assistant specialized in creating high-quality image generation prompts. Please provide detailed and creative descriptions that work well with Stable Diffusion.",
+            "temperature": 0.7,
+            "top_p": 0.9
+        },
+        "故事创作": {
+            "system_prompt": "You are a professional storyteller and prompt engineer, skilled at creating vivid and engaging scene descriptions for AI image generation.",
+            "temperature": 0.9,
+            "top_p": 0.95
+        },
+        "场景描写": {
+            "system_prompt": "You are an expert in detailed scene description, focusing on creating atmospheric and visually rich prompts for AI image generation.",
+            "temperature": 0.8,
+            "top_p": 0.9
+        },
+        "角色设计师": {
+            "system_prompt": "你是一位儿童绘本角色设定画师，你熟悉儿童的审美、爱好与视觉重点，精通于创造一个个鲜活的儿童绘本角色。同时你也是一位精通stable diffusion prompt的专家，擅长将心目中的角色形象的描述为 Stable Diffusion的prompt，通过你的prompt可以让stable diffusion通过文生图完美的重现你心目中的角色。现在，根据用户提供的需求，你结合你的画师能力与prompt专家能力，为用户用英文的Stable Diffusion prompt描述出角色的详细外观形象。\n\n## 创作要求\n-角色需要描述出物种，如果是幻想物种则通过prompt完整的描述出这种生物\n-角色需要根据设定描述出服装与饰品细节，如果角色是动物并且没有明确说明需要穿戴，则描述出这个动物的身体细节\n-角色需要有非常明显的特征用于识别\n-如果多个角色，需要对每一个角色建立独立的描述prompt\n-不要有环境描写，输出只是针对角色的描述\n-为角色取一个名字\n-整个prompt为一段文字\n-生成格式为\n\n##name##\n角色名称\n##prompt##\n角色描述",
+            "temperature": 1.5,
+            "top_p": 1.0
+        },
+        "画面鉴赏家": {
+            "system_prompt": "你是一位资深的艺术家，同时非常擅长使用AI绘画，在绘画的鉴赏方面，你可以用非常精确的的词汇描述绘画的风格，内容组成，画面细节，然后通过这些内容构建用于stable diffusion prompt。现在你根据用户的需求，分析看到的绘画，并通过英文的stable diffusion prompt描述出来。\n\n格式如下\n##绘画风格##\n关于绘画的风格用prompt非常详细的描述出来\n##绘画的内容##\n将画面的视觉内容用prompt非常详细的描述出来\n##绘画的角色##\n如果绘画内容有角色用prompt非常详细的描述出形象",
+            "temperature": 1.0,
+            "top_p": 1.0
+        },
+        "VLM绘画风格鉴赏大师": {
+            "system_prompt": "你是一位资深的艺术家，同时非常擅长使用AI绘画，在绘画的鉴赏方面，你可以用非常精确的的词汇描述绘画的风格，内容组成，画面细节，然后通过这些内容构建用于stable diffusion prompt。现在你根据用户的需求，分析看到的绘画，并通过英文的stable diffusion prompt描述出来。\n\n要求严格按照以下格式进行输出，输出内容为英文的stable diffusion prompt风格文字内容\n\n##绘画风格：##\n关于绘画的艺术家风格，画具风格，色彩风格用prompt非常详细的描述出来,不要有如人物、景色、植物这类具体对象\n##绘画的内容：##\n将画面的视觉内容用prompt非常详细的描述出来，不要有绘画风格，色彩风格方面的描述\n##绘画的角色：##\n如果绘画内容有角色用prompt非常详细的描述出形象，着重描述特征",
+            "temperature": 1.5,
+            "top_p": 1.0
+        },
+        "222": {
+            "system_prompt": "222",
+            "temperature": 1.0,
+            "top_p": 1.0
+        }
     },
-    "创意写作": {
-        "system_prompt": "你是一个富有创造力的写作助手，请根据用户的要求生成有趣、独特的内容。",
-        "user_prompt": "请创作一个关于...",
-        "temperature": 1.0,
-        "top_p": 0.95
+    "style_presets": {
+        "null": {
+            "prompt": ""
+        },
+        "写实风格": {
+            "prompt": "photorealistic, highly detailed, 8k uhd, high quality, masterpiece, professional photography, sharp focus"
+        },
+        "浪漫主义": {
+            "prompt": "romantic atmosphere, soft lighting, dreamy, ethereal, elegant, artistic, oil painting style, masterpiece"
+        },
+        "科幻风格": {
+            "prompt": "sci-fi, futuristic, cyberpunk, neon lights, high tech, detailed mechanical parts, cinematic lighting, concept art"
+        },
+        "奇幻风格": {
+            "prompt": "fantasy art, magical, mystical atmosphere, ethereal lighting, detailed environment, epic scene, digital art, concept art"
+        },
+        "蓝图风格": {
+            "prompt": "Blueprint Schematic Drawing, , technical drawing, blueprint, schematic"
+        },
+        "儿童水彩插画风格": {
+            "prompt": "A whimsical and playful illustration with a soft, pastel color palette. The artwork features a mix of watercolor and ink techniques, creating a delicate and textured appearance. The style is reminiscent of children's book illustrations, with a focus on charming and friendly characters."
+        }
     },
-    "精确回答": {
-        "system_prompt": "你是一个专注于提供精确信息的助手，请保持回答的准确性和可靠性。",
-        "user_prompt": "请详细说明...",
-        "temperature": 0.3,
-        "top_p": 0.8
+    "shot_presets": {
+        "null": {
+            "prompt": ""
+        },
+        "特写镜头": {
+            "prompt": "close-up shot, detailed facial features, shallow depth of field, bokeh effect, portrait composition"
+        },
+        "全景镜头": {
+            "prompt": "wide shot, panoramic view, establishing shot, vast landscape, epic scale, cinematic composition"
+        },
+        "跟随镜头": {
+            "prompt": "dynamic shot, action scene, motion blur, dramatic angle, third-person perspective"
+        },
+        "俯视镜头": {
+            "prompt": "bird's eye view, aerial shot, top-down perspective, wide angle lens, high angle shot"
+        },
+        "角色设定": {
+            "prompt": "A character reference sheet on a gradient gray background. The sheet includes three views of a character: full-body front view, full-body side view, and full-body back view. Each view clearly shows the character's consistent appearance, including clothing, accessories, and unique features. The background is a smooth gradient from light gray to dark gray."
+        },
+        "角色设定-正面背面": {
+            "prompt": "A character reference sheet on a gradient gray background. The sheet includes two views of a character: full-body front view, and full-body back view. Each view clearly shows the character's consistent appearance, including clothing, accessories, and unique features. The background is a smooth gradient from light gray to dark gray."
+        }
+    },
+    "character_presets": {
+        "null": {
+            "prompt": ""
+        },
+        "冒险家": {
+            "prompt": "human adventurer, male explorer, tanned skin, rugged face with stubble, determined brown eyes, weathered brown leather jacket, khaki cargo pants, worn hiking boots, adventure hat, climbing gear on utility belt, compass and map in hand, backpack with survival equipment"
+        },
+        "智者": {
+            "prompt": "human scholar, elderly wise man, long white beard, deep wrinkles around wise eyes, gold-rimmed spectacles, elaborate dark blue robe with golden astronomical patterns, leather-bound ancient book in hands, golden sash with mystical symbols, ornate staff with crystal top"
+        },
+        "机器人": {
+            "prompt": "humanoid robot, brushed titanium body, glowing blue LED eyes, exposed mechanical joints, transparent chest panel showing internal gears, sleek white armor plates, digital displays on forearms, retractable antenna, cooling vents emitting soft blue light, metallic fingers with precision tools"
+        },
+        "魔法师": {
+            "prompt": "human wizard, tall figure, sharp facial features, intense purple eyes, ornate purple and gold robes with constellation patterns, pointed wizard hat with silver runes, magical staff crackling with energy, levitating spell book, glowing magical crystals on belt, enchanted jewelry"
+        },
+        "龙": {
+            "prompt": "western dragon, massive reptilian creature, iridescent red scales, golden belly scales, huge leathery wings with intricate patterns, long horned head, glowing amber eyes, razor-sharp teeth, armored tail with spikes, curved black claws, smoke from nostrils, muscular limbs"
+        },
+        "狼": {
+            "prompt": "dire wolf, large canine creature, thick grey and white fur, muscular build, sharp pointed ears, fierce yellow eyes, prominent fangs, broad chest, powerful legs, bushy tail, battle scars on face, tribal markings in fur pattern, alert hunting posture"
+        },
+        "老虎": {
+            "prompt": "bengal tiger, majestic feline predator, vibrant orange fur with black stripes, white chest and belly, powerful muscular body, large paws with retractable claws, intense green eyes, distinctive facial markings, long striped tail, sharp fangs, regal posture, alert ears"
+        },
+        "狐狸": {
+            "prompt": "mystical fox, elegant vulpine creature, red-orange fur with white tips, multiple flowing tails, glowing golden eyes, delicate pointed ears, ornate golden jewelry, ethereal wisps around paws, intricate fur patterns, graceful posture, magical aura, spirit markings on face"
+        },
+        "猫头鹰": {
+            "prompt": "great horned owl, wise nocturnal bird, mottled brown and white feathers, large orange eyes, distinctive ear tufts, sharp curved beak, intricate feather patterns, broad wings, taloned feet, heart-shaped facial disc, speckled chest feathers, dignified perching pose"
+        },
+        "蝴蝶": {
+            "prompt": "giant butterfly, iridescent wings with intricate patterns, vibrant blue and purple coloration, delicate antennae with golden tips, shimmering scales, translucent wing membranes, ornate spiral patterns, glowing wing edges, jewel-like body, graceful floating movement"
+        },
+        "海豚": {
+            "prompt": "bottlenose dolphin, sleek aquatic mammal, smooth grey skin with lighter underbelly, playful expression, curved dorsal fin, powerful tail flukes, streamlined body, intelligent eyes, distinctive beak-like snout, water droplets on skin, graceful swimming motion"
+        },
+        "孔雀": {
+            "prompt": "indian peacock, majestic bird, iridescent blue-green plumage, elaborate tail fan with eyespots, royal blue neck, ornate head crest, delicate feet, shimmering feathers, proud stance, golden and bronze highlights, detailed feather texture, regal bearing"
+        },
+        "蛇": {
+            "prompt": "mystical serpent, large cobra, iridescent scales with geometric patterns, hood with ancient symbols, glowing eyes, jeweled markings along spine, metallic sheen, ornate head crest, forked tongue, hypnotic patterns, coiled posture, magical energy wisps"
+        },
+        "鹿": {
+            "prompt": "ethereal stag, majestic cervine, pure white fur, massive branching antlers with crystal tips, gentle brown eyes, glowing forest markings, delicate legs, short tail, mystical symbols in fur pattern, noble bearing, forest spirit aura, nature magic wisps"
+        },
+        "熊猫": {
+            "prompt": "giant panda, distinctive black and white fur, round body, gentle expression, black eye patches, large head, soft rounded ears, powerful limbs, thick fur texture, bamboo leaves in paws, peaceful demeanor, sitting pose, fluffy appearance"
+        },
+        "批量": {
+            "prompt": "11111"
+        }
     }
-} 
+}

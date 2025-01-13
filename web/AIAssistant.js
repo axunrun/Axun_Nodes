@@ -7,6 +7,7 @@ const createModelFetchExtension = (nodeName, endpoint) => {
         async beforeRegisterNodeDef(nodeType, nodeData, app) {
             if (nodeData.name === nodeName) {
                 const originalNodeCreated = nodeType.prototype.onNodeCreated;
+                
                 nodeType.prototype.onNodeCreated = async function () {
                     if (originalNodeCreated) {
                         originalNodeCreated.apply(this, arguments);
@@ -17,6 +18,12 @@ const createModelFetchExtension = (nodeName, endpoint) => {
                         console.warn("[AIAssistant] 未找到model widget");
                         return;
                     }
+
+                    if (this._modelListInitialized) {
+                        console.debug(`[AIAssistant] ${nodeName}模型列表已初始化，跳过加载`);
+                        return;
+                    }
+                    this._modelListInitialized = true;
 
                     const fetchModels = async () => {
                         try {
@@ -44,16 +51,18 @@ const createModelFetchExtension = (nodeName, endpoint) => {
                     };
 
                     const updateModels = async () => {
-                        const prevValue = modelWidget.value;
-                        modelWidget.value = "";
-                        modelWidget.options.values = [];
+                        if (modelWidget.value && modelWidget.options.values && modelWidget.options.values.length > 0) {
+                            console.debug(`[AIAssistant] ${nodeName}保持当前选择:`, modelWidget.value);
+                            return;
+                        }
 
                         const models = await fetchModels();
                         
+                        const prevValue = modelWidget.value;
+                        
                         modelWidget.options.values = models;
-                        console.debug(`[AIAssistant] 更新${nodeName}模型列表:`, models);
-
-                        if (models.includes(prevValue)) {
+                        
+                        if (prevValue && models.includes(prevValue)) {
                             modelWidget.value = prevValue;
                         } else if (models.length > 0) {
                             modelWidget.value = models[0];

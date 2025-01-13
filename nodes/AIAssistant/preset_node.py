@@ -35,51 +35,45 @@ class AIAssistantPreset:
             
             if not os.path.exists(config_path):
                 print(f"[AIAssistant] 配置文件不存在，将创建默认配置")
-                # 如果配置文件不存在，创建默认配置
                 default_config = {
-                    "通用对话": {
-                        "system_prompt": "你是一个AI助手，请根据用户的问题提供准确、有帮助的回答。",
-                        "user_prompt": "请描述一下...",
-                        "temperature": 0.7,
-                        "top_p": 0.9
+                    "system_presets": {
+                        "null": {
+                            "system_prompt": "",
+                            "temperature": 0.7,
+                            "top_p": 0.9
+                        },
+                        "通用场景": {
+                            "system_prompt": "You are an AI assistant specialized in creating high-quality image generation prompts. Please provide detailed and creative descriptions that work well with Stable Diffusion.",
+                            "temperature": 0.7,
+                            "top_p": 0.9
+                        }
+                    },
+                    "style_presets": {
+                        "null": {"prompt": ""},
+                        "写实风格": {"prompt": "photorealistic, highly detailed, 8k uhd, high quality, masterpiece, professional photography, sharp focus"}
+                    },
+                    "shot_presets": {
+                        "null": {"prompt": ""},
+                        "特写镜头": {"prompt": "close-up shot, detailed facial features, shallow depth of field, bokeh effect, portrait composition"}
+                    },
+                    "character_presets": {
+                        "null": {"prompt": ""},
+                        "冒险家": {"prompt": "adventurous explorer, rugged appearance, determined expression, weathered clothing, exploration gear, dynamic pose"},
+                        "智者": {"prompt": "wise scholar, sophisticated appearance, thoughtful expression, elegant clothing, academic attire, dignified pose"},
+                        "机器人": {"prompt": "advanced android, sleek metallic surface, glowing interface, precise mechanical details, robotic features, high-tech design"},
+                        "魔法师": {"prompt": "powerful mage, ornate robes, mystical artifacts, glowing magical effects, arcane symbols, dramatic lighting"}
                     }
                 }
                 os.makedirs(os.path.dirname(config_path), exist_ok=True)
-                cls.save_presets(default_config)  # 使用save_presets方法保存
+                cls.save_presets(default_config)
                 return default_config
             
-            try:
-                # 尝试直接读取
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    print(f"[AIAssistant] 读取到的配置文件内容: {content}")
-                    presets = json.loads(content)
-            except UnicodeDecodeError:
-                # 如果UTF-8解码失败，尝试其他编码
-                print(f"[AIAssistant] UTF-8解码失败，尝试其他编码")
-                with open(config_path, 'r', encoding='gbk') as f:
-                    content = f.read()
-                    print(f"[AIAssistant] GBK解码后的内容: {content}")
-                    presets = json.loads(content)
-            
-            # 验证加载的数据
-            if not isinstance(presets, dict):
-                raise ValueError("配置文件格式错误，应该是一个字典")
-            
-            print(f"[AIAssistant] 成功加载预设配置，当前预设: {list(presets.keys())}")
+            with open(config_path, 'r', encoding='utf-8') as f:
+                presets = json.loads(f.read())
             return presets
         except Exception as e:
             print(f"[AIAssistant] 加载预设配置失败: {e}")
-            print(f"[AIAssistant] 将使用默认配置")
-            # 返回默认配置
-            return {
-                "通用对话": {
-                    "system_prompt": "你是一个AI助手，请根据用户的问题提供准确、有帮助的回答。",
-                    "user_prompt": "请描述一下...",
-                    "temperature": 0.7,
-                    "top_p": 0.9
-                }
-            }
+            return cls.get_default_config()
 
     @classmethod
     def save_presets(cls, presets):
@@ -111,84 +105,201 @@ class AIAssistantPreset:
             return False
 
     @classmethod
-    def INPUT_TYPES(s):
-        """获取输入类型"""
-        presets = s.load_presets()  # 每次都重新加载
-        preset_names = list(presets.keys())
-        print(f"[AIAssistant] INPUT_TYPES返回的预设列表: {preset_names}")
+    def get_default_config(cls):
+        """获取默认配置"""
         return {
-            "required": {
-                "preset": (preset_names, ),
+            "system_presets": {
+                "null": {
+                    "system_prompt": "",
+                    "temperature": 0.7,
+                    "top_p": 0.9
+                },
+                "通用场景": {
+                    "system_prompt": "You are an AI assistant specialized in creating high-quality image generation prompts. Please provide detailed and creative descriptions that work well with Stable Diffusion.",
+                    "temperature": 0.7,
+                    "top_p": 0.9
+                }
+            },
+            "style_presets": {
+                "null": {"prompt": ""},
+                "写实风格": {"prompt": "photorealistic, highly detailed, 8k uhd, high quality, masterpiece, professional photography, sharp focus"}
+            },
+            "shot_presets": {
+                "null": {"prompt": ""},
+                "特写镜头": {"prompt": "close-up shot, detailed facial features, shallow depth of field, bokeh effect, portrait composition"}
+            },
+            "character_presets": {
+                "null": {"prompt": ""},
+                "冒险家": {"prompt": "adventurous explorer, rugged appearance, determined expression, weathered clothing, exploration gear, dynamic pose"},
+                "智者": {"prompt": "wise scholar, sophisticated appearance, thoughtful expression, elegant clothing, academic attire, dignified pose"},
+                "机器人": {"prompt": "advanced android, sleek metallic surface, glowing interface, precise mechanical details, robotic features, high-tech design"},
+                "魔法师": {"prompt": "powerful mage, ornate robes, mystical artifacts, glowing magical effects, arcane symbols, dramatic lighting"}
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "FLOAT", "FLOAT")
-    RETURN_NAMES = ("system_prompt", "user_prompt", "temperature", "top_p")
+    @classmethod
+    def INPUT_TYPES(s):
+        """获取输入类型"""
+        try:
+            presets = s.load_presets()
+            # 确保所有预设类型都存在
+            if not all(key in presets for key in ["system_presets", "style_presets", "shot_presets", "character_presets"]):
+                print("[AIAssistant] 预设配置不完整，使用默认配置")
+                presets = s.get_default_config()
+
+            # 获取角色预设列表
+            character_presets = list(presets.get("character_presets", {}).keys())
+            
+            return {
+                "required": {
+                    "system_preset": (list(presets.get("system_presets", {}).keys()),),
+                    "custom_system": ("STRING", {"multiline": True}),
+                    "style_preset": (list(presets.get("style_presets", {}).keys()),),
+                    "shot_preset": (list(presets.get("shot_presets", {}).keys()),),
+                    "character_a_preset": (character_presets,),
+                    "character_b_preset": (character_presets,),
+                    "character_c_preset": (character_presets,),
+                    "custom_prompt": ("STRING", {"multiline": True}),
+                    "seed_mode": (["fixed", "increment", "decrement", "randomize"],),
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                }
+            }
+        except Exception as e:
+            print(f"[AIAssistant] INPUT_TYPES加载失败: {e}")
+            # 使用默认配置
+            default_config = s.get_default_config()
+            character_presets = list(default_config["character_presets"].keys())
+            return {
+                "required": {
+                    "system_preset": (list(default_config["system_presets"].keys()),),
+                    "custom_system": ("STRING", {"multiline": True}),
+                    "style_preset": (list(default_config["style_presets"].keys()),),
+                    "shot_preset": (list(default_config["shot_presets"].keys()),),
+                    "character_a_preset": (character_presets,),
+                    "character_b_preset": (character_presets,),
+                    "character_c_preset": (character_presets,),
+                    "custom_prompt": ("STRING", {"multiline": True}),
+                    "seed_mode": (["fixed", "increment", "decrement", "randomize"],),
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})
+                }
+            }
+
+    RETURN_TYPES = ("STRING", "STRING", "FLOAT", "FLOAT", "INT")
+    RETURN_NAMES = ("system_prompt", "user_prompt", "temperature", "top_p", "seed")
     FUNCTION = "apply_preset"
     OUTPUT_NODE = True
     CATEGORY = "!Axun Nodes/AIAssistant"
 
-    def apply_preset(self, preset):
-        """应用预设配置"""
-        presets = self.load_presets()  # 每次应用时重新加载
-        print(f"[AIAssistant] 应用预设 {preset}，当前可用预设: {list(presets.keys())}")
+    def apply_preset(self, system_preset, custom_system, style_preset, shot_preset, 
+                    character_a_preset, character_b_preset, character_c_preset, 
+                    custom_prompt, seed_mode, seed):
+        """应用预设配置并组合输出"""
+        presets = self.load_presets()
         
-        if preset not in presets:
-            print(f"[AIAssistant] 预设 {preset} 不存在，使用默认值")
-            return ("", "", 0.7, 0.9)
+        # 获取系统预设
+        system_config = presets["system_presets"].get(system_preset, {})
+        system_prompt = system_config.get("system_prompt", "")
+        temperature = system_config.get("temperature", 0.7)
+        top_p = system_config.get("top_p", 0.9)
         
-        config = presets[preset]
-        return (
-            config.get("system_prompt", ""),
-            config.get("user_prompt", ""),
-            config.get("temperature", 0.7),
-            config.get("top_p", 0.9)
-        )
+        # 组合用户提示词
+        prompt_parts = []
+        
+        # 添加风格预设和自定义风格
+        style_prompt = presets["style_presets"].get(style_preset, {}).get("prompt", "").strip()
+        custom_style_text = custom_system.strip()
+        
+        if style_preset != "null" or custom_style_text:
+            style_parts = []
+            if style_preset != "null" and style_prompt:
+                style_parts.append(style_prompt)
+            if custom_style_text:
+                style_parts.append(custom_style_text)
+            prompt_parts.append(f"Style: {', '.join(style_parts)}")
+        
+        # 添加镜头预设
+        if shot_preset != "null":
+            shot_prompt = presets["shot_presets"].get(shot_preset, {}).get("prompt", "")
+            if shot_prompt:
+                prompt_parts.append(f"Camera: {shot_prompt}")
+        
+        # 添加角色预设
+        character_presets = presets.get("character_presets", {})
+        for preset_name, role_prefix in [
+            (character_a_preset, "Character A"),
+            (character_b_preset, "Character B"),
+            (character_c_preset, "Character C")
+        ]:
+            if preset_name != "null":
+                char_prompt = character_presets.get(preset_name, {}).get("prompt", "")
+                if char_prompt:
+                    prompt_parts.append(f"{role_prefix}: {char_prompt}")
+        
+        # 添加自定义提示词（直接添加原文）
+        if custom_prompt.strip():
+            prompt_parts.append(custom_prompt.strip())
+        
+        # 组合最终用户提示词，使用双换行符分隔段落
+        user_prompt = "\n\n".join(prompt_parts) if prompt_parts else ""
+        
+        # 处理种子值
+        final_seed = seed
+        
+        return (system_prompt, user_prompt, temperature, top_p, final_seed)
 
 # 注册路由处理函数
 @PromptServer.instance.routes.post("/axun/AIAssistant/presets")
 async def get_presets(request):
-    """获取预设列表"""
+    """获取所有预设列表"""
     try:
-        presets = AIAssistantPreset.load_presets()  # 每次都重新加载
-        preset_names = list(presets.keys())
-        print(f"[AIAssistant] API返回预设列表: {preset_names}")
-        return web.json_response(preset_names)
+        presets = AIAssistantPreset.load_presets()
+        return web.json_response(presets)
     except Exception as e:
         print(f"[AIAssistant] 获取预设列表失败: {e}")
-        return web.json_response(["获取预设列表失败"])
+        return web.json_response({"error": str(e)})
 
 @PromptServer.instance.routes.post("/axun/AIAssistant/save_preset")
 async def save_preset(request):
-    """保存新预设"""
+    """保存预设"""
     try:
         data = await request.json()
+        preset_type = data.get("type")  # 新增预设类型参数
         preset_name = data.get("name")
-        preset_config = {
-            "system_prompt": data.get("system_prompt", ""),
-            "user_prompt": data.get("user_prompt", ""),
-            "temperature": float(data.get("temperature", 0.7)),
-            "top_p": float(data.get("top_p", 0.9))
-        }
         
-        print(f"[AIAssistant] 准备保存预设: {preset_name}")
-        print(f"[AIAssistant] 预设内容: {preset_config}")
+        if not preset_type or not preset_name:
+            raise ValueError("预设类型和名称不能为空")
         
-        # 加载当前预设
         presets = AIAssistantPreset.load_presets()
-        print(f"[AIAssistant] 当前已有预设: {list(presets.keys())}")
+        preset_key = f"{preset_type}_presets"
         
-        # 更新预设
-        presets[preset_name] = preset_config
+        # 检查预设类型是否有效
+        if preset_key not in presets:
+            raise ValueError(f"无效的预设类型: {preset_type}")
+            
+        # 检查是否为保护的预设
+        if preset_name == "null":
+            raise ValueError("不能覆盖null预设")
+            
+        if preset_type == "system" and preset_name == "通用场景":
+            raise ValueError("不能覆盖默认场景预设")
         
-        # 保存到文件
+        # 保存预设
+        if preset_type == "system":
+            presets[preset_key][preset_name] = {
+                "system_prompt": data.get("system_prompt", ""),
+                "temperature": float(data.get("temperature", 0.7)),
+                "top_p": float(data.get("top_p", 0.9))
+            }
+        else:
+            presets[preset_key][preset_name] = {
+                "prompt": data.get("prompt", "")
+            }
+        
         if AIAssistantPreset.save_presets(presets):
-            print(f"[AIAssistant] 预设 {preset_name} 保存成功")
             return web.json_response({"status": "success"})
         else:
             raise Exception("保存预设失败")
     except Exception as e:
-        print(f"[AIAssistant] 保存预设失败: {e}")
         return web.json_response({"status": "error", "message": str(e)})
 
 @PromptServer.instance.routes.post("/axun/AIAssistant/delete_preset")
@@ -196,31 +307,29 @@ async def delete_preset(request):
     """删除预设"""
     try:
         data = await request.json()
+        preset_type = data.get("type")
         preset_name = data.get("name")
         
-        print(f"[AIAssistant] 准备删除预设: {preset_name}")
+        if not preset_type or not preset_name:
+            raise ValueError("预设类型和名称不能为空")
         
-        # 加载当前预设
         presets = AIAssistantPreset.load_presets()
-        print(f"[AIAssistant] 当前已有预设: {list(presets.keys())}")
+        preset_key = f"{preset_type}_presets"
         
-        # 检查预设是否存在
-        if preset_name not in presets:
-            raise Exception(f"预设 {preset_name} 不存在")
-            
-        # 检查是否是默认预设
-        if preset_name == "通用对话":
-            raise Exception("默认预设不能删除")
-            
-        # 删除预设
-        del presets[preset_name]
+        if preset_key not in presets:
+            raise ValueError(f"无效的预设类型: {preset_type}")
         
-        # 保存到文件
+        if preset_name not in presets[preset_key]:
+            raise ValueError(f"预设不存在: {preset_name}")
+            
+        if preset_name == "null":
+            raise ValueError("null预设不能删除")
+            
+        del presets[preset_key][preset_name]
+        
         if AIAssistantPreset.save_presets(presets):
-            print(f"[AIAssistant] 预设 {preset_name} 删除成功")
             return web.json_response({"status": "success"})
         else:
             raise Exception("删除预设失败")
     except Exception as e:
-        print(f"[AIAssistant] 删除预设失败: {e}")
         return web.json_response({"status": "error", "message": str(e)}) 

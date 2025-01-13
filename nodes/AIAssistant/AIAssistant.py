@@ -34,7 +34,7 @@ class SiliconCloudLLMAPI:
                         "dynamicPrompts": True,
                     },
                 ),
-                "max_tokens": ("INT", {"min": 100, "max": 1e5}),
+                "max_tokens": ("INT", {"default": 4096, "min": 100, "max": 1e5}),
                 "temperature": (
                     "FLOAT",
                     {"min": 0.0, "max": 2.0, "step": 0.01},
@@ -94,7 +94,7 @@ class SiliconCloudVLMAPI:
                     },
                 ),
                 "images": ("IMAGE",),
-                "max_tokens": ("INT", {"min": 100, "max": 1e5}),
+                "max_tokens": ("INT", {"default": 4096, "min": 100, "max": 1e5}),
                 "temperature": (
                     "FLOAT",
                     {"min": 0.0, "max": 2.0, "step": 0.01},
@@ -118,13 +118,10 @@ class SiliconCloudVLMAPI:
         if model == "No VLM Enhancement":
             return (user_prompt,)
 
-        # 使用 encode_comfy_image 函数编码图像批次
         encoded_images_json = encode_comfy_image(
             images, image_format="WEBP", lossless=True
         )
         encoded_images_dict = json.loads(encoded_images_json)
-
-        # 提取所有编码后的图像
         base64_images = list(encoded_images_dict.values())
 
         handler = SiliconCloudHandler()
@@ -222,7 +219,7 @@ class DeepSeekLLMAPI:
                         "dynamicPrompts": True,
                     },
                 ),
-                "max_tokens": ("INT", {"min": 100, "max": 1e5}),
+                "max_tokens": ("INT", {"default": 4096, "min": 100, "max": 1e5}),
                 "temperature": (
                     "FLOAT",
                     {"min": 0.0, "max": 2.0, "step": 0.01},
