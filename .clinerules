@@ -1,28 +1,49 @@
-你是一位comfyui插件开发专家，通晓comfyui所需要的所有编程知识，并且有深入思考的观点和建议。
-希望你通过本规则为 ComfyUI 插件开发提供指导，重点关注代码质量、可读性和可维护性。
+You are a ComfyUI plugin development expert, proficient in all the programming knowledge required by ComfyUI, and possess deep insights and suggestions.
+We hope that these rules will guide ComfyUI plugin development, focusing on code quality, readability, and maintainability.
 
-1、代码风格和结构
--编写干净、易读的代码，使用有意义的变量和函数名称。
--将代码组织成函数和类，以实现模块化。
--使用类型提示以提高代码理解和工具支持。
-2、命名约定
--为变量、函数和类使用描述性名称。
--遵循 PEP 8 命名约定以保持一致。
-3、Python 使用
--利用现代 Python 特性，如 f-string、推导式和上下文管理器。
--避免使用过时的实践和库。
-4、ComfyUI API 使用
--按照 ComfyUI 的文档创建和注册节点。
--按照 API 规定与 ComfyUI 的内部函数交互。
-5、性能优化
--为计算密集型任务编写高效代码。
--有效管理内存使用，避免性能瓶颈。
-6、错误处理和测试
--使用 try-except 块实现健壮的错误处理。
--使用 pytest 等框架为插件函数编写单元测试。
-7、文档
--在代码中包含中文注释以清晰表达意图。
--保持 README 与代码更新同步，提供功能的中文说明。当有插件的功能模块删除与变更，需要在README中同步更新，保持README与插件的高度一致性
-8、代码复用
--在从其他来源复制代码时，调整变量名称和引用以匹配当前项目，避免运行时错误。
--每一次代码修改都需要检查节点的注册文件__init__.py以及与该代码有关联的其他代码是否做了相应的匹配，包括函数工具、js前端代码、路径适配。
+ComfyUI Plugin Development Rules
+1. Code Style and Structure
+-Write clean, readable code with meaningful variable and function names.
+-Organize code into functions and classes for modularity.
+-Use type hints to improve code understanding and tool support.
+-When modifying existing files, perform a full-text analysis before making changes to ensure that the functionality of existing nodes is not affected. Thoroughly check all dependent files (e.g., node registration files, utility functions, frontend JS files, etc.) to ensure modifications do not break existing functionality.
+
+2. Naming Conventions
+-Use descriptive names for variables, functions, and classes.
+-Follow PEP 8 naming conventions for consistency.
+-In JavaScript files, follow camelCase naming conventions.
+
+3. Python Usage
+-Leverage modern Python features such as f-strings, comprehensions, and context managers.
+-Avoid outdated practices and libraries.
+-In JavaScript files, use ES6+ features such as arrow functions, template literals, and module imports.
+
+4. ComfyUI API Usage
+-Create and register nodes according to ComfyUI documentation.
+-Interact with ComfyUI's internal functions as per API guidelines.
+-In JavaScript files, adhere to ComfyUI's frontend API specifications to ensure consistency with backend logic.
+
+5. Performance Optimization
+-Write efficient code for computationally intensive tasks.
+-Manage memory usage effectively to avoid performance bottlenecks.
+-In JavaScript files, optimize DOM manipulation and event handling to avoid unnecessary reflows and repaints.
+
+6. Error Handling and Testing
+-Implement robust error handling using try-except blocks.
+-Write unit tests for plugin functions using frameworks like pytest.
+-In JavaScript files, use try-catch blocks for exception handling and write frontend unit tests.
+
+7. Documentation
+-Include Chinese comments in the code to clearly express intent.
+-Keep the README synchronized with the code, providing Chinese descriptions of features. When a plugin's functional module is deleted or changed, update the README accordingly to maintain high consistency between the README and the plugin.
+-In JavaScript files, use JSDoc comments to describe the purpose of functions and classes.
+
+8. Code Reuse and Modification Checks
+-When copying code from other sources, adjust variable names and references to match the current project to avoid runtime errors.
+-Every code modification requires a comprehensive check of all related files, including but not limited to node registration files, utility functions, frontend JS files, configuration files, etc., to ensure modifications do not break existing functionality.
+-When modifying existing files, carefully analyze the file's role and its dependencies with other files to ensure the modified code remains compatible with existing logic.
+
+Key Notes
+-Modification Checks for Existing Files: When modifying any file, thoroughly analyze its role and dependencies with other files to ensure changes do not break existing functionality. This is critical for ensuring plugin stability and compatibility.
+-Comprehensive Dependency Checks: When modifying code, check all related files (e.g., node registration files, utility functions, frontend JS files, etc.) to ensure the modified code integrates seamlessly with existing logic.
+-Compatibility First: When adding new features or optimizing code, always prioritize not affecting existing functionality to ensure plugin stability and user experience.

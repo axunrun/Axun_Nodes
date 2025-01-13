@@ -1,6 +1,6 @@
-# Axun Nodes - ComfyUI 插件 v1.02
+# Axun Nodes - ComfyUI 插件 v1.03
 
-Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发、SUPIR超分和翻译功能。
+Axun Nodes 是一个用于ComfyUI的插件，提供AI助手、路径处理、队列触发、SUPIR超分和翻译功能。
 
 ## 项目结构说明
 
@@ -10,10 +10,15 @@ Axun Nodes 是一个用于ComfyUI的插件，提供路径处理、队列触发�
 axun_nodes/
 ├── nodes/                  # 节点实现目录
 │   ├── AIAssistant/       # AI助手节点
-│   │   ├── __init__.py.bak  # 备份的初始化文件
-│   │   └── llm_node.py      # LLM节点实现(350行)
+│   │   ├── __init__.py      # 初始化文件
+│   │   ├── AIAssistant.py   # AI助手节点实现(260行)
+│   │   ├── preset_node.py   # 预设节点实现(226行)
+│   │   └── utils/           # 工具函数目录
+│   │       ├── api_handler.py  # API处理器(599行)
+│   │       ├── image_utils.py  # 图像工具(65行)
+│   │       ├── config_manager.py # 配置管理(74行)
+│   │       └── __init__.py      # 初始化文件(9行)
 │   ├── Qtools/            # 队列工具节点
-│   │   ├── __init__.py.bak  # 备份的初始化文件
 │   │   ├── dir_picker.py    # 目录选择节点(162行)
 │   │   ├── path_processor.py # 路径处理节点(198行)
 │   │   ├── queue_trigger.py  # 队列触发节点(143行)
@@ -26,14 +31,33 @@ axun_nodes/
 │   │   │   ├── models/     # 模型定义
 │   │   │   │   ├── autoencoder.py  # 自编码器(338行)
 │   │   │   │   ├── diffusion.py    # 扩散模型(323行)
-│   │   │   │   └── __init__.py
+│   │   │   │   └── __init__.py     # 初始化文件(3行)
 │   │   │   ├── modules/    # 模块组件
 │   │   │   │   ├── attention.py       # 注意力机制(639行)
 │   │   │   │   ├── autoencoding/      # 自编码相关
-│   │   │   │   ├── diffusionmodules/  # 扩散模块
-│   │   │   │   ├── distributions/     # 分布函数
+│   │   │   │   │   ├── regularizers/  # 正则化器
+│   │   │   │   │   ├── lpips/        # LPIPS损失
+│   │   │   │   │   └── losses/       # 损失函数
+│   │   │   │   ├── diffusionmodules/ # 扩散模块
+│   │   │   │   │   ├── wrappers.py         # 包装器(107行)
+│   │   │   │   │   ├── sigma_sampling.py   # 采样器(41行)
+│   │   │   │   │   ├── util.py            # 工具函数(316行)
+│   │   │   │   │   ├── sampling.py        # 采样实现(752行)
+│   │   │   │   │   ├── sampling_utils.py  # 采样工具(49行)
+│   │   │   │   │   ├── model.py          # 模型定义(756行)
+│   │   │   │   │   ├── openaimodel.py    # OpenAI模型(1273行)
+│   │   │   │   │   ├── discretizer.py    # 离散化器(70行)
+│   │   │   │   │   ├── guiders.py        # 引导器(89行)
+│   │   │   │   │   ├── loss.py           # 损失函数(70行)
+│   │   │   │   │   ├── denoiser_scaling.py    # 降噪缩放(32行)
+│   │   │   │   │   ├── denoiser_weighting.py  # 降噪权重(25行)
+│   │   │   │   │   ├── denoiser.py           # 降噪器(74行)
+│   │   │   │   │   └── __init__.py           # 初始化文件(8行)
+│   │   │   │   ├── distributions/  # 分布函数
+│   │   │   │   │   └── distributions.py  # 分布实现(103行)
 │   │   │   │   ├── ema.py            # 指数移动平均(87行)
 │   │   │   │   ├── encoders/         # 编码器
+│   │   │   │   │   └── modules.py    # 编码器模块(1093行)
 │   │   │   │   └── __init__.py
 │   │   │   ├── util.py      # 工具函数(251行)
 │   │   │   └── __init__.py
@@ -43,14 +67,16 @@ axun_nodes/
 │   │   ├── supir_first_stage.py  # 第一阶段(117行)
 │   │   ├── supir_model_loader.py # 模型加载器(269行)
 │   │   ├── supir_sample.py       # 采样器(186行)
-│   │   └── __init__.py.bak
+│   │   └── __init__.py
 │   ├── Lotus/             # Lotus深度/法线预测节点
 │   │   ├── lotus_nodes.py   # Lotus节点实现(151行)
-│   │   └── __init__.py.bak
+│   │   └── __init__.py
 │   └── Translator/        # 翻译功能节点
 │       ├── translator_node.py # 翻译节点实现(86行)
 │       ├── utils/            # 翻译工具
-│       └── __init__.py.bak
+│       │   ├── translator_utils.py # 翻译工具函数(98行)
+│       │   └── __init__.py        # 初始化文件(11行)
+│       └── __init__.py
 ├── utils/                 # 工具函数目录
 │   ├── api_handler.py     # API处理器(483行)
 │   ├── config_utils.py    # 配置工具(146行)
@@ -60,18 +86,20 @@ axun_nodes/
 │   ├── web_utils.py       # Web工具(33行)
 │   └── utils.py           # 通用工具函数(58行)
 ├── web/                   # 前端代码目录
+│   ├── AIAssistant.js     # AI助手功能(95行)
+│   ├── AIAssistant_preset.js # AI助手预设功能(211行)
 │   ├── qtools.js          # 队列工具前端功能(176行)
-│   ├── translator.js      # 翻译功能(104行)
-│   └── llm.js             # LLM相关功能(413行)
+│   └── translator.js      # 翻译功能(104行)
 ├── config/                # 配置文件目录
-│   ├── axun_nodes.json    # 插件主配置(194行)
-│   ├── dir_picker.json    # 目录选择器配置(1行)
-│   ├── llm_config.json    # LLM配置(56行)
-│   ├── lotus_nodes.json   # Lotus节点配置(73行)
-│   ├── translator.json    # 翻译API配置(6行)
+│   ├── AIAssistant_presets.json # AI助手预设配置
+│   ├── AIAssistant_config.json  # AI助手配置
+│   ├── dir_picker.json    # 目录选择器配置
+│   ├── lotus_nodes.json   # Lotus节点配置
+│   ├── translator.json    # 翻译API配置
 │   └── empty_text_embed.pt # 空文本嵌入模型
-├── __init__.py            # 插件初始化和节点注册(139行)
-└── README.md              # 项目说明文档(578行)
+├── __init__.py            # 插件初始化和节点注册(146行)
+├── requirements.txt       # 依赖包列表
+└── README.md              # 项目说明文档(704行)
 ```
 
 ### 代码量统计
@@ -93,7 +121,7 @@ axun_nodes/
    - 与前端交互较多，需要配合qtools.js使用
 
 3. **AI助手模块**
-   - 集中在单个llm_node.py文件中
+   - 集中在单个AIAssistant.py文件中
    - 代码量较大但结构清晰
    - 主要处理API调用和响应处理
 
@@ -275,202 +303,143 @@ axun_nodes/
 - `appid` (STRING): 百度翻译API的APPID
 - `key` (STRING): 百度翻译API的密钥
 
-### LLM 分组
+### AI Assistant 分组
 
-#### LLM Assistant (AI助手节点)
+#### AI Assistant Preset (AI助手预设节点)
+**功能：**
+- 管理和应用对话预设配置
+- 支持创建、保存和删除预设
+- 预设包含系统提示词、用户提示词和参数配置
+
 **输入参数：**
-- `provider` (COMBO): 服务提供商选择 [Silicon Cloud LLM, Silicon Cloud VLM, Deepseek]
-- `model` (COMBO): 模型选择（动态获取可用模型列表）
-- `scene` (COMBO): 场景选择 [代码生成, 数学解题, 数据分析, 通用对话, 翻译, 创意写作]
+- `preset` (COMBO): 预设配置选择
+
+**输出：**
 - `system_prompt` (STRING): 系统提示词
 - `user_prompt` (STRING): 用户提示词
+- `temperature` (FLOAT): 温度参数
+- `top_p` (FLOAT): Top P参数
+
+#### Silicon Cloud LLM API (Silicon大语言模型API)
+**功能：**
+- 支持多种LLM模型
+- 动态获取可用模型列表
+- 可配置的生成参数
+
+**输入参数：**
+- `model` (COMBO): 模型选择（动态获取）
+- `system_prompt` (STRING): 系统提示词
+- `user_prompt` (STRING): 用户提示词
+- `max_tokens` (INT): 最大生成长度 [100-100000]
 - `temperature` (FLOAT): 温度参数 [0.0-2.0]
-- `top_p` (FLOAT): 采样范围 [0-1.0]
-- `max_tokens` (INT): 最大生成长度
-- `image` (IMAGE): 图片输入 (仅VLM模式可用)
-- `detail` (BOOLEAN): 详细分析 (仅VLM模式可用)
+- `top_p` (FLOAT): Top P参数 [0.0-1.0]
+- `presence_penalty` (FLOAT): 存在惩罚 [0.0-2.0]
+- `frequency_penalty` (FLOAT): 频率惩罚 [0.0-2.0]
 
-**功能特点：**
-1. 多提供商支持
-   - Silicon Cloud LLM: 文本对话
-   - Silicon Cloud VLM: 图文理解
-   - Deepseek: 文本对话
+**输出：**
+- `STRING`: 生成的文本内容
 
-2. 场景预设
-   - 每个场景都有针对不同提供商优化的参数配置
-   - 切换场景时自动更新相关参数
-   - 支持手动调整参数
+#### Silicon Cloud VLM API (Silicon视觉语言模型API)
+**功能：**
+- 支持图像理解和分析
+- 动态获取可用模型列表
+- 可配置的分析细节程度
 
-3. API管理
-   - 支持在界面设置和验证API密钥
-   - 自动检测API密钥有效性
-   - 配置文件存储API密钥
+**输入参数：**
+- `model` (COMBO): 模型选择（动态获取）
+- `system_prompt` (STRING): 系统提示词
+- `user_prompt` (STRING): 用户提示词
+- `image` (IMAGE): 输入图像
+- `max_tokens` (INT): 最大生成长度 [100-100000]
+- `temperature` (FLOAT): 温度参数 [0.0-2.0]
+- `top_p` (FLOAT): Top P参数 [0.0-1.0]
+- `presence_penalty` (FLOAT): 存在惩罚 [0.0-2.0]
+- `frequency_penalty` (FLOAT): 频率惩罚 [0.0-2.0]
+- `detail` (COMBO): 图像分析细节程度 [auto, low, high]
 
-**开发进度：**
-- [x] 基础框架搭建
-- [x] 多提供商支持
-- [x] 场景预设功能
-- [x] API密钥管理
-- [x] 参数动态调整
-- [ ] 图片输入功能
-- [ ] 详细分析开关
-- [ ] 错误处理优化
-- [ ] 界面美化
+**输出：**
+- `STRING`: 生成的文本内容
 
-**配置文件：**
-在 `config/llm_config.json` 中可以设置：
+#### Deepseek LLM API (Deepseek大语言模型API)
+**功能：**
+- 支持Deepseek的LLM模型
+- 动态获取可用模型列表
+- 可配置的生成参数
+
+**输入参数：**
+- `model` (COMBO): 模型选择（动态获取）
+- `system_prompt` (STRING): 系统提示词
+- `user_prompt` (STRING): 用户提示词
+- `max_tokens` (INT): 最大生成长度 [100-100000]
+- `temperature` (FLOAT): 温度参数 [0.0-2.0]
+- `top_p` (FLOAT): Top P参数 [0.0-1.0]
+- `presence_penalty` (FLOAT): 存在惩罚 [0.0-2.0]
+- `frequency_penalty` (FLOAT): 频率惩罚 [0.0-2.0]
+
+**输出：**
+- `STRING`: 生成的文本内容
+
+### 配置文件说明
+
+#### AIAssistant_config.json
+API配置文件，存储在插件目录的 `config` 目录下：
+
 ```json
 {
     "silicon_cloud": {
-        "api_key": "",
-        "base_url": "https://api.siliconflow.cn/v1"
+        "api_key": "YOUR_API_KEY",
+        "api_base": "https://api.siliconflow.com/v1",
+        "model_list_endpoint": "/models",
+        "chat_endpoint": "/chat/completions"
     },
     "deepseek": {
-        "api_key": "",
-        "base_url": "https://api.deepseek.com/v1"
-    },
-    "parameters": {
-        "presets": {
-            "通用": {
-                "temperature": 0.7,
-                "top_p": 0.9
-            },
-            "创意": {
-                "temperature": 1.0,
-                "top_p": 0.95
-            },
-            "精确": {
-                "temperature": 0.3,
-                "top_p": 0.8
-            }
-        }
+        "api_key": "YOUR_API_KEY",
+        "api_base": "https://api.deepseek.com/v1",
+        "model_list_endpoint": "/models",
+        "chat_endpoint": "/chat/completions"
     }
 }
 ```
 
-**使用说明：**
-1. 首次使用配置：
-   - 编辑 `config/llm_config.json`
-   - 填入相应服务商的API密钥
-   - 可选调整参数预设
+#### AIAssistant_presets.json
+预设配置文件，存储在插件目录的 `config` 目录下，用于管理对话预设：
 
-2. 基本使用：
-   - 选择服务提供商
-   - 选择模型
-   - 设置系统提示词（可选）
-   - 输入用户提示词
-   - 调整生成参数（可选）
-
-3. 参数调优：
-   - temperature越高，生成内容越随机创意
-   - temperature越低，生成内容越稳定精确
-   - max_tokens决定生成内容的最大长度
-
-4. 错误处理：
-   - 自动重试API请求
-   - 详细的错误日志
-   - 友好的错误提示
-
-**工作流示例：**
-```mermaid
-graph LR
-    A[Text Input] --> B[LLM Assistant]
-    B --> C[Text Output]
-    B --> D[Save Response]
-```
-
-**注意事项：**
-- 需要有效的API密钥
-- 需要稳定的网络连接
-- 注意API使用配额
-- 建议根据需求调整参数
-- 系统提示词对生成质量有重要影响
-
-### DeepseekChat 分组
-
-#### Deepseek Chat (AI对话节点)
-**输入参数：**
-- `prompt` (STRING): 要发送给AI的文本内容
-- `image_path` (STRING): 要上传的图片路径（可选）
-- `mode` (COMBO): 对话模式 [chat, image_upload]
-- `new_conversation` (BOOLEAN): 是否开始新对话
-- `email` (STRING, 可选): Deepseek账号邮箱
-- `password` (STRING, 可选): Deepseek账号密码
-- `system_prompt` (STRING, 可选): 系统提示词，用于设置对话上下文
-
-**输出：**
-- `response` (STRING): AI的回复内容
-- `conversation_id` (STRING): 当前会话ID
-
-**功能特点：**
-- 支持文本对话和图片上传
-- 自动登录和会话管理
-- 支持系统提示词设置
-- 智能等待AI回复
-- 自动重试机制
-- 会话历史记录
-- 配置文件支持
-
-**配置文件：**
-在 `config/deepseek_config.json` 中可以设置：
 ```json
 {
-    "credentials": {
-        "email": "",
-        "password": ""
-    },
-    "browser_settings": {
-        "headless": true,
-        "timeout": 30,
-        "retry_attempts": 3
-    },
-    "chat_settings": {
-        "max_retries": 3,
-        "retry_delay": 5,
-        "response_timeout": 60
+    "通用对话": {
+        "system_prompt": "你是一个AI助手，请根据用户的问题提供准确、有帮助的回答。",
+        "user_prompt": "请描述一下...",
+        "temperature": 0.7,
+        "top_p": 0.9
     }
 }
 ```
 
-**使用说明：**
-1. 首次使用配置：
-   - 编辑 `config/deepseek_config.json`
-   - 填入Deepseek账号信息（可选）
-   - 调整浏览器和对话设置（可选）
-
-2. 文本对话模式：
-   - 输入提示文本
-   - 设置 `new_conversation` 决定是否开始新对话
-   - 可选设置系统提示词
-
-3. 图片上传模式：
-   - 设置图片路径
-   - 选择 `image_upload` 模式
-   - 输入相关提示文本
-
-4. 会话管理：
-   - 使用 `conversation_id` 跟踪对话
-   - 可以在多个节点间共享会话
-
-**注意事项：**
-- 需要安装Chrome浏览器
-- 需要稳定的网络连接
-- 建议在使用完毕后关闭节点以释放资源
-- 账号信息优先使用节点输入，其次使用配置文件
-- 超时和重试参数可在配置文件中调整
-
-**工作流示例：**
-```mermaid
-graph LR
-    A[Text Input] --> B[Deepseek Chat]
-    C[Image Load] --> B
-    B --> D[Text Output]
-    B --> E[Save Response]
-```
+**配置说明：**
+- 支持创建多个预设场景
+- 每个预设包含完整的参数配置
+- 通过预设节点快速应用配置
+- 支持在运行时动态修改预设
 
 ## 工作流示例
 
-### 1. 批量超分工作流
+### 1. AI助手对话工作流
+```mermaid
+graph LR
+    A[AI Assistant Preset] --> B[Silicon Cloud LLM API]
+    B --> C[Queue Trigger]
+    C --> D[Save Text]
+```
+
+### 2. 图像分析工作流
+```mermaid
+graph LR
+    A[Load Image] --> B[Silicon Cloud VLM API]
+    C[AI Assistant Preset] --> B
+    B --> D[Save Text]
+```
+
+### 3. 批量超分工作流
 ```mermaid
 graph LR
     A[SUPIR Model Loader] --> B[SUPIR Encode]
@@ -481,7 +450,7 @@ graph LR
     F --> G[Save Image]
 ```
 
-### 2. Lotus深度预测工作流
+### 4. Lotus深度预测工作流
 ```mermaid
 graph LR
     A[Load Image] --> B[Load Lotus Model]
@@ -489,7 +458,7 @@ graph LR
     C --> D[Save Image]
 ```
 
-### 3. 批量处理工作流
+### 5. 批量处理工作流
 ```mermaid
 graph LR
     A[Directory Picker] --> C[Path Processor]
@@ -497,6 +466,62 @@ graph LR
     C --> D[Queue Trigger]
     D --> E[Process Node]
 ```
+
+### 6. 翻译辅助工作流
+```mermaid
+graph LR
+    A[Text Input] --> |Double Click| B[Translator]
+    B --> C[Text Output]
+```
+
+### 工作流说明
+
+1. **AI助手对话工作流**
+   - 使用预设节点加载常用配置
+   - 通过LLM API生成回复
+   - 可选保存对话内容
+
+2. **图像分析工作流**
+   - 加载图像进行分析
+   - 使用预设的提示词和参数
+   - 生成图像描述或分析结果
+
+3. **批量超分工作流**
+   - 完整的SUPIR超分流程
+   - 包含编码、条件控制和采样
+   - 支持批量处理大量图像
+
+4. **Lotus深度预测工作流**
+   - 简单的深度图生成流程
+   - 支持批量处理
+   - 可调整采样参数
+
+5. **批量处理工作流**
+   - 通用的批量处理框架
+   - 支持多种处理模式
+   - 灵活的文件过滤和排序
+
+6. **翻译辅助工作流**
+   - 支持双击触发翻译
+   - 自动识别语言方向
+   - 集成到其他工作流中
+
+### 工作流优化建议
+
+1. **性能优化**
+   - 合理设置批处理大小
+   - 适当使用低内存模式
+   - 注意资源释放
+
+2. **稳定性优化**
+   - 添加错误处理节点
+   - 使用Queue Trigger控制流程
+   - 定期保存中间结果
+
+3. **交互优化**
+   - 使用预设节点简化配置
+   - 添加进度显示
+   - 合理设置默认参数
 
 ## 安装
 1. 将本插件目录放入ComfyUI的`custom_nodes`目录
@@ -507,23 +532,42 @@ graph LR
    - transformers
    - omegaconf
    - einops
-   - requests (用于翻译API)
+   - requests
 3. 确保已安装tkinter：
    - Windows: 通常已预装
    - macOS: `brew install python-tk`
    - Linux: `sudo apt install python3-tk`
-4. 下载 SUPIR 模型：
+4. 下载 SUPIR 模型（可选）：
    - 从 [Hugging Face](https://huggingface.co/camenduru/SUPIR) 下载模型文件
    - 将模型文件放置在 `ComfyUI/models/supir` 目录下
-5. 下载 Lotus 模型：
+5. 下载 Lotus 模型（可选）：
    - 从 [Hugging Face](https://huggingface.co/Kijai/lotus-comfyui/tree/main) 下载模型文件
    - 将模型文件放置在 `ComfyUI/models/diffusion_models` 目录下
-6. 配置翻译功能（可选）：
+6. 配置 AI Assistant（必需）：
+   - 编辑 `config/AIAssistant_config.json` 文件
+   - 填入相应的API密钥和配置信息
+7. 配置翻译功能（可选）：
    - 编辑 `config/translator.json` 文件
-   - 填入百度翻译API密钥（已预设可用密钥）
-7. 重启ComfyUI
+   - 填入百度翻译API密钥
+8. 重启ComfyUI
 
 ## 使用技巧
+
+### AI Assistant 使用
+1. **预设管理**：
+   - 使用预设节点快速应用常用配置
+   - 可以创建、保存和删除自定义预设
+   - 预设包含完整的参数配置
+
+2. **参数调优**：
+   - temperature 影响输出的随机性
+   - top_p 影响词汇选择的多样性
+   - max_tokens 控制生成长度
+
+3. **图像分析**：
+   - 使用 VLM API 进行图像理解
+   - 调整 detail 参数控制分析细节程度
+   - 根据场景选择合适的模型
 
 ### 路径处理
 1. **批量模式**：
@@ -551,16 +595,6 @@ graph LR
    - 调整 cfg 值
    - 使用更强的提示词
 
-### Lotus深度预测
-1. **性能优化**：
-   - 使用 fp16 精度
-   - 适当调整批处理大小
-   - 根据需要开启 keep_model_loaded
-
-2. **内存管理**：
-   - 处理大批量时减小 per_batch
-   - 不需要时关闭 keep_model_loaded
-
 ### 翻译功能
 1. **使用建议**：
    - 短文本直接双击翻译
@@ -573,6 +607,15 @@ graph LR
    - 查看浏览器控制台错误信息
 
 ## 更新日志
+
+### v1.03 (2024-01-13)
+- 新增 AI Assistant 功能组
+  - 实现预设节点管理
+  - 集成 Silicon Cloud LLM/VLM API
+  - 集成 Deepseek LLM API
+  - 支持参数预设配置
+  - 完善错误处理机制
+  - 优化前端交互体验
 
 ### v1.02 (2024-01-08)
 - 集成 Lotus 深度/法线预测功能

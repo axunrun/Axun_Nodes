@@ -55,8 +55,7 @@ from .nodes.Qtools.queue_trigger import ImpactQueueTriggerCountdown
 from .nodes.Qtools.work_mode import WorkMode
 
 # AI助手节点组
-from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAPI, DeepSeekLLMAPI
-from .nodes.AIAssistant.preset_node import AIAssistantPreset
+from .nodes.AIAssistant.llm_node import LLMNode
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
@@ -83,20 +82,17 @@ NODE_CLASS_MAPPINGS = {
     "axun_nodes_PathProcessor": PathProcessor,
     "axun_nodes_QueueTrigger": ImpactQueueTriggerCountdown,
     "axun_nodes_WorkMode": WorkMode,
-    
+
     # AI助手节点组
-    "SiliconCloudLLMAPI": SiliconCloudLLMAPI,
-    "SiliconCloudVLMAPI": SiliconCloudVLMAPI,
-    "DeepSeekLLMAPI": DeepSeekLLMAPI,
-    "AIAssistantPreset": AIAssistantPreset,
-    
+    "LLMNode": LLMNode,
+
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
-    
+
     # Lotus节点组
     "LoadLotusModel": LoadLotusModel,
     "LotusSampler": LotusSampler,
-    
+
     # SUPIR节点组
     "SUPIR_sample": SUPIR_sample,
     "SUPIR_first_stage": SUPIR_first_stage,
@@ -113,20 +109,17 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "axun_nodes_PathProcessor": "🔍 Path Processor",
     "axun_nodes_QueueTrigger": "⏱️ Queue Trigger",
     "axun_nodes_WorkMode": "⚙️ Work Mode",
-    
+
     # AI助手节点组
-    "SiliconCloudLLMAPI": "🤖 Silicon Cloud LLM",
-    "SiliconCloudVLMAPI": "🔍 Silicon Cloud VLM",
-    "DeepSeekLLMAPI": "🤖 DeepSeek LLM",
-    "AIAssistantPreset": "⚙️ AI Assistant Preset",
-    
+    "LLMNode": "🤖 AI Assistant",
+
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",
-    
+
     # Lotus节点组
     "LoadLotusModel": "🧠 Load Lotus Model",
     "LotusSampler": "✨ Lotus Sampler",
-    
+
     # SUPIR节点组
     "SUPIR_sample": "🎨 SUPIR Sampler",
     "SUPIR_first_stage": "🖼️ SUPIR First Stage",
