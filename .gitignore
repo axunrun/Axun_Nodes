@@ -37,8 +37,8 @@ ENV/
 *.log
 
 # 配置文件
-config/*.json
-!config/lotus_unet_config.json
+config/AIAssistant_config.json
+config/translator.json
 
 # 学习和测试目录
 learn/
