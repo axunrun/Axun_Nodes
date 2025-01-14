@@ -215,13 +215,13 @@ class AIAssistantPreset:
                 style_parts.append(style_prompt)
             if custom_style_text:
                 style_parts.append(custom_style_text)
-            prompt_parts.append(f"Style: {', '.join(style_parts)}")
+            prompt_parts.append(f"Style:\n{', '.join(style_parts)}")
         
         # 添加镜头预设
         if shot_preset != "null":
             shot_prompt = presets["shot_presets"].get(shot_preset, {}).get("prompt", "")
             if shot_prompt:
-                prompt_parts.append(f"Camera: {shot_prompt}")
+                prompt_parts.append(f"Camera:\n{shot_prompt}")
         
         # 添加角色预设
         character_presets = presets.get("character_presets", {})
@@ -233,7 +233,7 @@ class AIAssistantPreset:
             if preset_name != "null":
                 char_prompt = character_presets.get(preset_name, {}).get("prompt", "")
                 if char_prompt:
-                    prompt_parts.append(f"{role_prefix}: {char_prompt}")
+                    prompt_parts.append(f"{role_prefix}:\n{char_prompt}")
         
         # 添加自定义提示词（直接添加原文）
         if custom_prompt.strip():

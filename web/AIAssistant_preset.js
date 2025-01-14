@@ -462,49 +462,48 @@ app.registerExtension({
                     widgets.push(editButton);
                 }
 
-                // 添加角色预设选择器和编辑按钮
-                for (const [widget, prefix, type] of [
-                    [characterAPresetWidget, "A", "character_a"],
-                    [characterBPresetWidget, "B", "character_b"],
-                    [characterCPresetWidget, "C", "character_c"]
+                // 添加角色预设选择器
+                for (const [widget, prefix] of [
+                    [characterAPresetWidget, "A"],
+                    [characterBPresetWidget, "B"],
+                    [characterCPresetWidget, "C"]
                 ]) {
                     if (widget) {
                         widget.type = "combo";
                         widgets.push(widget);
-                        
-                        // 添加角色预设编辑按钮
-                        const editButton = this.addWidget("button", `编辑角色${prefix}预设`, null, async () => {
-                            const presets = await PresetService.getPresets();
-                            const dialog = createPresetDialog(type, `编辑角色${prefix}预设`, {
-                                name: { label: "角色名称", type: "text" },
-                                prompt: { label: "角色提示词", type: "textarea", rows: 5 }
-                            }, presets.character_presets || {});
-                            
-                            dialog.querySelector("form").onsubmit = async (e) => {
-                                e.preventDefault();
-                                const formData = {
-                                    name: dialog.querySelector("#name").value,
-                                    prompt: dialog.querySelector("#prompt").value
-                                };
-                                
-                                if (!formData.name) {
-                                    alert("请输入预设名称");
-                                    return;
-                                }
-                                
-                                const success = await PresetService.savePreset("character", formData);
-                                if (success) {
-                                    await updatePresets(this);
-                                    widget.value = formData.name;
-                                    dialog.close();
-                                } else {
-                                    alert("保存预设失败");
-                                }
-                            };
-                        });
-                        widgets.push(editButton);
                     }
                 }
+
+                // 添加统一的角色预设编辑按钮
+                const editCharacterButton = this.addWidget("button", "编辑角色预设", null, async () => {
+                    const presets = await PresetService.getPresets();
+                    const dialog = createPresetDialog("character", "编辑角色预设", {
+                        name: { label: "角色名称", type: "text" },
+                        prompt: { label: "角色提示词", type: "textarea", rows: 5 }
+                    }, presets.character_presets || {});
+                    
+                    dialog.querySelector("form").onsubmit = async (e) => {
+                        e.preventDefault();
+                        const formData = {
+                            name: dialog.querySelector("#name").value,
+                            prompt: dialog.querySelector("#prompt").value
+                        };
+                        
+                        if (!formData.name) {
+                            alert("请输入预设名称");
+                            return;
+                        }
+                        
+                        const success = await PresetService.savePreset("character", formData);
+                        if (success) {
+                            await updatePresets(this);
+                            dialog.close();
+                        } else {
+                            alert("保存预设失败");
+                        }
+                    };
+                });
+                widgets.push(editCharacterButton);
 
                 // 添加自定义提示词输入框
                 if (customPromptWidget) {

@@ -57,6 +57,7 @@ from .nodes.Qtools.work_mode import WorkMode
 # AI助手节点组
 from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAPI, DeepSeekLLMAPI
 from .nodes.AIAssistant.preset_node import AIAssistantPreset
+from .nodes.AIAssistant.text_processor import TextProcessor
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
@@ -89,6 +90,7 @@ NODE_CLASS_MAPPINGS = {
     "SiliconCloudVLMAPI": SiliconCloudVLMAPI,
     "DeepSeekLLMAPI": DeepSeekLLMAPI,
     "AIAssistantPreset": AIAssistantPreset,
+    "TextProcessor": TextProcessor,
     
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
@@ -119,6 +121,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SiliconCloudVLMAPI": "🔍 Silicon Cloud VLM",
     "DeepSeekLLMAPI": "🤖 DeepSeek LLM",
     "AIAssistantPreset": "⚙️ AI Assistant Preset",
+    "TextProcessor": "📝 Text Processor",
     
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",
