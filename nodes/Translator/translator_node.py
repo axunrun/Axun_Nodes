@@ -33,18 +33,20 @@ class TranslatorNode:
     def translate(self, text: str) -> tuple:
         """
         执行翻译操作，自动识别中英文并互译
+        支持全文多段落翻译
         Args:
             text: 要翻译的文本
         Returns:
             tuple: 包含翻译后文本的元组
         """
-        print(f"[Translator] 开始翻译文本: {text}")
+        print(f"[Translator] 开始翻译文本...")
         if not text.strip():
             print("[Translator] 文本为空，跳过翻译")
             return (text,)
             
-        # 使用工具函数检测语言
-        is_chinese_text = is_chinese(text)
+        # 使用工具函数检测第一段文本的语言
+        first_paragraph = text.split('\n')[0]
+        is_chinese_text = is_chinese(first_paragraph)
         print(f"[Translator] 检测到{'中' if is_chinese_text else '英'}文")
         
         try:
@@ -75,7 +77,7 @@ class TranslatorNode:
             # 关闭事件循环
             loop.close()
             
-            print(f"[Translator] 翻译完成: {result}")
+            print(f"[Translator] 翻译完成")
             return (result,)
         except Exception as e:
             print(f"[Translator] 翻译失败: {e}")

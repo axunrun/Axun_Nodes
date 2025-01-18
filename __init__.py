@@ -58,6 +58,7 @@ from .nodes.Qtools.work_mode import WorkMode
 from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAPI, DeepSeekLLMAPI
 from .nodes.AIAssistant.preset_node import AIAssistantPreset
 from .nodes.AIAssistant.text_processor import TextProcessor
+from .nodes.AIAssistant.number_generator import NumberGenerator
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
@@ -91,6 +92,7 @@ NODE_CLASS_MAPPINGS = {
     "DeepSeekLLMAPI": DeepSeekLLMAPI,
     "AIAssistantPreset": AIAssistantPreset,
     "TextProcessor": TextProcessor,
+    "NumberGenerator": NumberGenerator,
     
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
@@ -105,7 +107,7 @@ NODE_CLASS_MAPPINGS = {
     "SUPIR_encode": SUPIR_encode,
     "SUPIR_decode": SUPIR_decode,
     "SUPIR_conditioner": SUPIR_conditioner,
-    "SUPIR_model_loader": SUPIR_model_loader,
+    "SUPIR_model_loader": SUPIR_model_loader
 }
 
 # 节点显示名称映射
@@ -122,6 +124,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DeepSeekLLMAPI": "🤖 DeepSeek LLM",
     "AIAssistantPreset": "⚙️ AI Assistant Preset",
     "TextProcessor": "📝 Text Processor",
+    "NumberGenerator": "🔢 Number Generator",
     
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",
@@ -136,7 +139,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SUPIR_encode": "📥 SUPIR Encode",
     "SUPIR_decode": "📤 SUPIR Decode",
     "SUPIR_conditioner": "🔧 SUPIR Conditioner",
-    "SUPIR_model_loader": "💾 SUPIR Model Loader",
+    "SUPIR_model_loader": "💾 SUPIR Model Loader"
 }
 
 #######################

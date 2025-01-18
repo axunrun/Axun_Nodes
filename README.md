@@ -1,4 +1,4 @@
-# Axun Nodes - ComfyUI 插件 v1.04
+# Axun Nodes - ComfyUI 插件 v1.05
 
 Axun Nodes 是一个用于ComfyUI的插件，提供AI助手、路径处理、队列触发、SUPIR超分和翻译功能。
 
@@ -14,6 +14,7 @@ axun_nodes/
 │   │   ├── AIAssistant.py   # AI助手节点实现
 │   │   ├── preset_node.py   # 预设节点实现
 │   │   ├── text_processor.py # 文本处理节点
+│   │   ├── number_generator.py # 数字生成器节点
 │   │   └── utils/           # 工具函数目录
 │   │       ├── api_handler.py  # API处理器
 │   │       ├── image_utils.py  # 图像工具
@@ -144,6 +145,16 @@ axun_nodes/
    - 输入: 文本内容、处理参数
    - 输出: 处理后的文本、计数器值
    - 功能: 文本拼接、计数、格式化
+
+4. **Number Generator**: 数字生成器节点
+   - 输入: 前缀文本、中间文本、数字值、最大值、后缀文本
+   - 输出: 组合后的文本
+   - 功能: 自动递增数字生成，支持循环计数
+   - 特点: 
+     * 自动递增：每次执行时数字自动加1
+     * 循环计数：达到最大值后自动重置为1
+     * 文本组合：支持前缀、中间文本和后缀的灵活组合
+     * 状态保持：保持每个节点的独立计数状态
 
 ### 队列工具节点
 1. **Queue Trigger**: 队列触发节点
@@ -318,7 +329,7 @@ graph LR
 
 ## 更新日志
 
-### v1.04 (2024-03-21)
+### v1.05 (2024-03-21)
 - 新增 Text Processor 节点,支持文本拼接和计数功能
 - 优化 AI Assistant 节点的对话体验
 - 改进 Queue Trigger 的计数器功能

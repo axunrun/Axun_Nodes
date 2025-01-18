@@ -11,7 +11,7 @@ const state = {
 
 async function translateText(text) {
     try {
-        console.log("[Translator] 发送翻译请求:", text);
+        console.log("[Translator] 发送翻译请求...");
         const response = await fetch("/translator/translate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ async function translateText(text) {
         if (result.error) {
             throw new Error(result.error);
         }
-        console.log("[Translator] 翻译结果:", result.translated);
+        console.log("[Translator] 翻译完成");
         return result.translated;
     } catch (error) {
         console.error("[Translator] 翻译失败:", error);

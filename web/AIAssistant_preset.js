@@ -400,9 +400,9 @@ app.registerExtension({
                             
                             if (!formData.name) {
                                 alert("请输入预设名称");
-                                return;
-                            }
-                            
+                        return;
+                    }
+
                             const success = await PresetService.savePreset("style", formData);
                             if (success) {
                                 await updatePresets(this);
@@ -446,15 +446,15 @@ app.registerExtension({
                             
                             if (!formData.name) {
                                 alert("请输入预设名称");
-                                return;
-                            }
-                            
+                        return;
+                    }
+
                             const success = await PresetService.savePreset("shot", formData);
-                            if (success) {
+                    if (success) {
                                 await updatePresets(this);
                                 shotPresetWidget.value = formData.name;
                                 dialog.close();
-                            } else {
+                    } else {
                                 alert("保存预设失败");
                             }
                         };
@@ -493,7 +493,7 @@ app.registerExtension({
                             alert("请输入预设名称");
                             return;
                         }
-                        
+
                         const success = await PresetService.savePreset("character", formData);
                         if (success) {
                             await updatePresets(this);

@@ -56,6 +56,21 @@ app.registerExtension({
                         node.onWidgetChanged(textIndexWidget);
                     });
                 }
+                
+                // 调整文本框顺序
+                const widgets = node.widgets;
+                const appstartTextWidget = widgets.find(w => w.name === 'appstart_text');
+                const sampleTextWidget = widgets.find(w => w.name === 'sample_text');
+                
+                if (appstartTextWidget && sampleTextWidget) {
+                    // 确保 appstart_text 在 sample_text 之前
+                    const appstartIndex = widgets.indexOf(appstartTextWidget);
+                    const sampleIndex = widgets.indexOf(sampleTextWidget);
+                    if (appstartIndex > sampleIndex) {
+                        widgets.splice(appstartIndex, 1);
+                        widgets.splice(sampleIndex, 0, appstartTextWidget);
+                    }
+                }
             };
         }
     }

@@ -1,0 +1,385 @@
+import { api } from '../../../scripts/api.js';
+import { app } from '../../../scripts/app.js';
+
+// 预设管理服务
+class PresetService {
+    // 获取预设列表
+    static async getPresets() {
+        try {
+            const response = await api.fetchApi("/axun/AIAssistant/presets", {
+                method: "POST"
+            });
+            return await response.json();
+        } catch (error) {
+            console.error("[AIAssistant] 获取预设列表失败:", error);
+            return {};
+        }
+    }
+
+    // 保存预设
+    static async savePreset(type, preset) {
+        try {
+            const response = await api.fetchApi("/axun/AIAssistant/save_preset", {
+                method: "POST",
+                body: JSON.stringify({ type, ...preset })
+            });
+            const result = await response.json();
+            
+            // 处理需要确认覆盖的情况
+            if (result.status === "confirm_required") {
+                if (confirm(result.message)) {
+                    // 用户确认覆盖，重新发送请求
+                    const confirmResponse = await api.fetchApi("/axun/AIAssistant/save_preset", {
+                        method: "POST",
+                        body: JSON.stringify({ type, ...preset, confirm_overwrite: true })
+                    });
+                    const confirmResult = await confirmResponse.json();
+                    return confirmResult.status === "success";
+                }
+                return false;
+            }
+            
+            return result.status === "success";
+        } catch (error) {
+            console.error("[AIAssistant] 保存预设失败:", error);
+            return false;
+        }
+    }
+
+    // 删除预设
+    static async deletePreset(type, presetName) {
+        try {
+            const response = await api.fetchApi("/axun/AIAssistant/delete_preset", {
+                method: "POST",
+                body: JSON.stringify({ type, name: presetName })
+            });
+            const result = await response.json();
+            return result.status === "success";
+        } catch (error) {
+            console.error("[AIAssistant] 删除预设失败:", error);
+            return false;
+        }
+    }
+}
+
+// 创建预设对话框
+function createPresetDialog(type, title, fields, presets) {
+    const dialog = document.createElement("dialog");
+    dialog.style.padding = "20px";
+    dialog.style.borderRadius = "8px";
+    dialog.style.backgroundColor = "#2d2d2d";
+    dialog.style.color = "#ffffff";
+    dialog.style.border = "1px solid #666";
+    dialog.style.minWidth = "400px";
+    
+    // 添加预设选择下拉框
+    const presetOptions = Object.keys(presets).map(name => 
+        `<option value="${name}">${name}</option>`
+    ).join('');
+    
+    let fieldsHtml = `
+        <div>
+            <label>选择已有预设:</label>
+            <select id="preset_select" style="width: 100%; padding: 5px; background: #333; border: 1px solid #666; color: #fff; border-radius: 4px;">
+                <option value="">-- 新建预设 --</option>
+                ${presetOptions}
+            </select>
+        </div>`;
+    
+    for (const [key, config] of Object.entries(fields)) {
+        const { label, type: inputType, rows } = config;
+        if (inputType === "textarea") {
+            fieldsHtml += `
+                <div>
+                    <label>${label}:</label>
+                    <textarea id="${key}" rows="${rows || 5}" 
+                        style="width: 100%; padding: 5px; background: #333; border: 1px solid #666; color: #fff; border-radius: 4px; resize: vertical;"></textarea>
+                </div>`;
+        } else {
+            fieldsHtml += `
+                <div>
+                    <label>${label}:</label>
+                    <input type="${inputType}" id="${key}" ${inputType === "number" ? 'step="0.1" min="0" max="2"' : ''} 
+                        style="width: 100%; padding: 5px; background: #333; border: 1px solid #666; color: #fff; border-radius: 4px;">
+                </div>`;
+        }
+    }
+    
+    dialog.innerHTML = `
+        <h3 style="margin-top: 0;">${title}</h3>
+        <form method="dialog" style="display: flex; flex-direction: column; gap: 15px;">
+            ${fieldsHtml}
+            <div style="text-align: right; margin-top: 10px;">
+                <button type="button" onclick="this.closest('dialog').close()" 
+                    style="padding: 5px 15px; margin-right: 10px; background: #444; border: 1px solid #666; color: #fff; border-radius: 4px; cursor: pointer;">
+                    取消
+                </button>
+                <button type="button" id="load_preset_btn"
+                    style="padding: 5px 15px; margin-right: 10px; background: #444; border: 1px solid #666; color: #fff; border-radius: 4px; cursor: pointer;">
+                    载入
+                </button>
+                <button type="submit" 
+                    style="padding: 5px 15px; background: #1e90ff; border: none; color: #fff; border-radius: 4px; cursor: pointer;">
+                    保存
+                </button>
+            </div>
+        </form>
+    `;
+    
+    // 添加载入预设功能
+    const loadPresetBtn = dialog.querySelector("#load_preset_btn");
+    const presetSelect = dialog.querySelector("#preset_select");
+    
+    loadPresetBtn.onclick = () => {
+        const selectedPreset = presetSelect.value;
+        if (!selectedPreset) {
+            alert("请先选择一个预设");
+            return;
+        }
+        
+        const preset = presets[selectedPreset];
+        if (!preset) return;
+        
+        // 设置预设名称
+        const nameInput = dialog.querySelector("#name");
+        if (nameInput) nameInput.value = selectedPreset;
+        
+        // 根据预设类型设置其他字段
+        if (type === "system") {
+            const systemPromptInput = dialog.querySelector("#system_prompt");
+            const temperatureInput = dialog.querySelector("#temperature");
+            const topPInput = dialog.querySelector("#top_p");
+            
+            if (systemPromptInput) systemPromptInput.value = preset.system_prompt || "";
+            if (temperatureInput) temperatureInput.value = preset.temperature || 0.7;
+            if (topPInput) topPInput.value = preset.top_p || 0.9;
+        } else {
+            const promptInput = dialog.querySelector("#prompt");
+            if (promptInput) promptInput.value = preset.prompt || "";
+        }
+    };
+    
+    return dialog;
+}
+
+// 注册预设节点
+app.registerExtension({
+    name: "axun.AIAssistant.preset",
+    async beforeRegisterNodeDef(nodeType, nodeData, app) {
+        if (nodeData.name === "AIAssistantPreset") {
+            const originalNodeCreated = nodeType.prototype.onNodeCreated;
+            
+            nodeType.prototype.onNodeCreated = async function() {
+                if (originalNodeCreated) {
+                    originalNodeCreated.apply(this, arguments);
+                }
+
+                const node = this;
+                
+                // 获取所有预设选择控件
+                const presetWidgets = {
+                    system: node.widgets.find(w => w.name === "system_preset"),
+                    style: node.widgets.find(w => w.name === "style_preset"),
+                    shot: node.widgets.find(w => w.name === "shot_preset"),
+                    character_a: node.widgets.find(w => w.name === "character_a_preset"),
+                    character_b: node.widgets.find(w => w.name === "character_b_preset"),
+                    character_c: node.widgets.find(w => w.name === "character_c_preset")
+                };
+
+                // 获取自定义提示词输入框
+                const customPromptWidget = node.widgets.find(w => w.name === "custom_prompt");
+
+                // 更新预设列表
+                const updatePresets = async () => {
+                    try {
+                        const presets = await PresetService.getPresets();
+                        console.log("[AIAssistant] 加载到的预设:", presets);
+                        
+                        // 更新系统预设
+                        if (presetWidgets.system) {
+                            presetWidgets.system.options.values = Object.keys(presets.system_presets || {});
+                            presetWidgets.system.value = presetWidgets.system.options.values[0] || "null";
+                        }
+                        
+                        // 更新风格预设
+                        if (presetWidgets.style) {
+                            presetWidgets.style.options.values = Object.keys(presets.style_presets || {});
+                            presetWidgets.style.value = presetWidgets.style.options.values[0] || "null";
+                        }
+                        
+                        // 更新镜头预设
+                        if (presetWidgets.shot) {
+                            presetWidgets.shot.options.values = Object.keys(presets.shot_presets || {});
+                            presetWidgets.shot.value = presetWidgets.shot.options.values[0] || "null";
+                        }
+                        
+                        // 更新角色预设
+                        const characterOptions = Object.keys(presets.character_presets || {});
+                        console.log("[AIAssistant] 角色预设选项:", characterOptions);
+                        
+                        for (const widget of [presetWidgets.character_a, presetWidgets.character_b, presetWidgets.character_c]) {
+                            if (widget) {
+                                widget.options = widget.options || {};
+                                widget.options.values = characterOptions;
+                                widget.value = characterOptions[0] || "null";
+                                widget.type = "combo";
+                                widget.options.editable = false;
+                            }
+                        }
+                        
+                        // 更新自定义提示词输入框
+                        if (customPromptWidget) {
+                            customPromptWidget.type = "textarea";
+                            customPromptWidget.options = customPromptWidget.options || {};
+                            customPromptWidget.options.multiline = true;
+                        }
+                        
+                        app.graph.setDirtyCanvas(true);
+                    } catch (error) {
+                        console.error("[AIAssistant] 更新预设失败:", error);
+                    }
+                };
+
+                // 为每种预设类型添加编辑按钮
+                const presetConfigs = {
+                    system: {
+                        title: "编辑场景预设",
+                        fields: {
+                            name: { label: "预设名称", type: "text" },
+                            system_prompt: { label: "系统提示词", type: "textarea", rows: 5 },
+                            temperature: { label: "Temperature", type: "number" },
+                            top_p: { label: "Top P", type: "number" }
+                        }
+                    },
+                    style: {
+                        title: "编辑风格预设",
+                        fields: {
+                            name: { label: "风格名称", type: "text" },
+                            prompt: { label: "风格提示词", type: "textarea", rows: 5 }
+                        }
+                    },
+                    shot: {
+                        title: "编辑镜头预设",
+                        fields: {
+                            name: { label: "镜头名称", type: "text" },
+                            prompt: { label: "镜头提示词", type: "textarea", rows: 5 }
+                        }
+                    },
+                    character_a: {
+                        title: "编辑角色A预设",
+                        fields: {
+                            name: { label: "角色名称", type: "text" },
+                            prompt: { label: "角色提示词", type: "textarea", rows: 5 }
+                        }
+                    },
+                    character_b: {
+                        title: "编辑角色B预设",
+                        fields: {
+                            name: { label: "角色名称", type: "text" },
+                            prompt: { label: "角色提示词", type: "textarea", rows: 5 }
+                        }
+                    },
+                    character_c: {
+                        title: "编辑角色C预设",
+                        fields: {
+                            name: { label: "角色名称", type: "text" },
+                            prompt: { label: "角色提示词", type: "textarea", rows: 5 }
+                        }
+                    }
+                };
+
+                // 重新排列widgets顺序
+                const newWidgets = [];
+                
+                for (const [type, config] of Object.entries(presetConfigs)) {
+                    const widget = presetWidgets[type];
+                    if (!widget) continue;
+
+                    // 添加选择控件
+                    widget.type = "combo";
+                    widget.options = widget.options || {};
+                    widget.options.values = widget.options.values || [];
+                    widget.options.editable = true;
+                    newWidgets.push(widget);
+
+                    // 添加编辑按钮
+                    const editButton = node.addWidget("button", config.title, null, async () => {
+                        const presets = await PresetService.getPresets();
+                        const presetKey = type.startsWith("character") ? "character_presets" : `${type}_presets`;
+                        const dialog = createPresetDialog(type, config.title, config.fields, presets[presetKey] || {});
+                        
+                        dialog.querySelector("form").onsubmit = async (e) => {
+                            e.preventDefault();
+                            
+                            const formData = {};
+                            for (const [key, field] of Object.entries(config.fields)) {
+                                const input = dialog.querySelector(`#${key}`);
+                                if (field.type === "number") {
+                                    formData[key] = parseFloat(input.value);
+                                } else {
+                                    formData[key] = input.value;
+                                }
+                            }
+                            
+                            const { name, ...preset } = formData;
+                            if (!name) {
+                                alert("请输入预设名称");
+                                return;
+                            }
+
+                            // 对于角色预设，使用 character 作为类型
+                            const saveType = type.startsWith("character") ? "character" : type;
+                            const success = await PresetService.savePreset(saveType, { name, ...preset });
+                            if (success) {
+                                await updatePresets();
+                                widget.value = name;
+                                dialog.close();
+                            } else {
+                                alert("保存预设失败");
+                            }
+                        };
+
+                        document.body.appendChild(dialog);
+                        dialog.showModal();
+                    });
+                    newWidgets.push(editButton);
+                }
+
+                // 添加自定义提示词输入框
+                if (customPromptWidget) {
+                    customPromptWidget.type = "textarea";
+                    customPromptWidget.options = customPromptWidget.options || {};
+                    customPromptWidget.options.multiline = true;
+                    newWidgets.push(customPromptWidget);
+                }
+
+                // 添加随机种子控件
+                const seedWidget = node.widgets.find(w => w.name === "seed");
+                if (seedWidget) {
+                    // 创建种子数值显示控件
+                    seedWidget.type = "number";
+                    seedWidget.options = seedWidget.options || {};
+                    seedWidget.options.min = 0;
+                    seedWidget.options.max = Number.MAX_SAFE_INTEGER;
+                    seedWidget.options.step = 1;
+                    seedWidget.options.precision = 0;
+                    newWidgets.push(seedWidget);
+
+                    // 创建随机种子按钮
+                    const randomSeedButton = node.addWidget("button", "🎲", null, () => {
+                        seedWidget.value = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+                        app.graph.setDirtyCanvas(true);
+                    });
+                    randomSeedButton.serialize = false;
+                    newWidgets.push(randomSeedButton);
+                }
+
+                // 更新节点的widgets
+                node.widgets = newWidgets;
+
+                // 初始加载预设列表
+                await updatePresets();
+            };
+        }
+    }
+}); 
