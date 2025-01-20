@@ -59,6 +59,7 @@ from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAP
 from .nodes.AIAssistant.preset_node import AIAssistantPreset
 from .nodes.AIAssistant.text_processor import TextProcessor
 from .nodes.AIAssistant.number_generator import NumberGenerator
+from .nodes.AIAssistant.text_cache import TextCache
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
@@ -93,6 +94,7 @@ NODE_CLASS_MAPPINGS = {
     "AIAssistantPreset": AIAssistantPreset,
     "TextProcessor": TextProcessor,
     "NumberGenerator": NumberGenerator,
+    "TextCache": TextCache,
     
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
@@ -125,6 +127,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AIAssistantPreset": "⚙️ AI Assistant Preset",
     "TextProcessor": "📝 Text Processor",
     "NumberGenerator": "🔢 Number Generator",
+    "TextCache": "📝 Text Cache",
     
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",

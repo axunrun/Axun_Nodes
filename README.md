@@ -141,9 +141,24 @@ axun_nodes/
    - 功能: 加载和管理预设配置
 
 3. **Text Processor**: 文本处理节点
-   - 输入: 文本内容、处理参数
-   - 输出: 处理后的文本、计数器值
-   - 功能: 文本拼接、计数、格式化
+   - 输入: 
+     - 文本内容 (sample_text)
+     - 前置文本 (appstart_text)
+     - 后置文本 (append_text)
+     - 内容类型过滤 (content_type)
+     - 前缀后缀 (prefix, suffix)
+     - 文本索引 (text_index)
+     - 角色预设 (character_a/b/c_preset)
+   - 输出: 
+     - 场景文本 (scene_text)
+     - 故事文本 (story_text)
+     - 当前索引 (current_index)
+   - 功能: 
+     - 支持通过 content_type 参数筛选特定内容 (如 "scene_*,story_*")
+     - 自动递增文本索引，达到最大值后重置
+     - 智能提取大括号内的内容，去除标识符
+     - 根据场景角色自动筛选和添加相关角色信息
+     - 支持文本拼接和格式化
 
 ### 队列工具节点
 1. **Queue Trigger**: 队列触发节点
