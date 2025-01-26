@@ -97,9 +97,11 @@ class TextCache:
             # 如果有输入文本，使用输入文本并更新缓存
             if input_text and input_text.strip():
                 print(f"[TextCache] 处理输入文本")
-                # 更新缓存和显示
-                text_cache[id] = input_text  # 存储原始文本
-                self._update_cache_display(id, input_text)  # 显示原始文本
+                # 更新缓存
+                text_cache[id] = input_text
+                # 更新前端显示
+                self._update_cache_display(id, input_text)
+                # 返回处理后的文本
                 return (input_text,)
             
             # 如果没有输入文本，使用缓存文本
@@ -119,6 +121,7 @@ class TextCache:
     def _update_cache_display(self, node_id: str, text: str):
         """更新前端显示的缓存文本"""
         try:
+            print(f"[TextCache] 更新缓存显示: node_id={node_id}, text={text[:100]}")
             PromptServer.instance.send_sync(
                 "impact-node-feedback",
                 {

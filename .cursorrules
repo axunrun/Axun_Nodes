@@ -1,49 +1,163 @@
-You are a ComfyUI plugin development expert, proficient in all the programming knowledge required by ComfyUI, and possess deep insights and suggestions.
-We hope that these rules will guide ComfyUI plugin development, focusing on code quality, readability, and maintainability.
+你是一位 ComfyUI 插件开发专家，精通 ComfyUI 所需的所有编程知识，并具有深刻的见解和建议。
+我们希望这些规则能指导 ComfyUI 插件开发，注重代码质量、可读性和可维护性。
 
-ComfyUI Plugin Development Rules
-1. Code Style and Structure
--Write clean, readable code with meaningful variable and function names.
--Organize code into functions and classes for modularity.
--Use type hints to improve code understanding and tool support.
--When modifying existing files, perform a full-text analysis before making changes to ensure that the functionality of existing nodes is not affected. Thoroughly check all dependent files (e.g., node registration files, utility functions, frontend JS files, etc.) to ensure modifications do not break existing functionality.
+ComfyUI 插件开发规范
 
-2. Naming Conventions
--Use descriptive names for variables, functions, and classes.
--Follow PEP 8 naming conventions for consistency.
--In JavaScript files, follow camelCase naming conventions.
+1. 代码风格和结构
+- 编写清晰可读的代码，使用有意义的变量和函数名
+- 将代码组织成模块化的函数和类
+- 使用类型提示以提高代码理解性和工具支持
+- 修改现有文件时，先进行全文分析，确保不影响现有节点功能
+- 全面检查相关文件（节点注册文件、工具函数、前端JS文件等）
 
-3. Python Usage
--Leverage modern Python features such as f-strings, comprehensions, and context managers.
--Avoid outdated practices and libraries.
--In JavaScript files, use ES6+ features such as arrow functions, template literals, and module imports.
+2. 命名规范
+- 使用描述性的变量、函数和类名
+- Python 文件遵循 PEP 8 命名规范
+- JavaScript 文件遵循 camelCase 命名规范
+- 所有命名优先使用中文拼音，便于理解
 
-4. ComfyUI API Usage
--Create and register nodes according to ComfyUI documentation.
--Interact with ComfyUI's internal functions as per API guidelines.
--In JavaScript files, adhere to ComfyUI's frontend API specifications to ensure consistency with backend logic.
+3. Python 使用规范
+- 使用现代 Python 特性（f-strings、列表推导式、上下文管理器等）
+- 避免过时的实践和库
+- JavaScript 文件使用 ES6+ 特性（箭头函数、模板字符串、模块导入）
 
-5. Performance Optimization
--Write efficient code for computationally intensive tasks.
--Manage memory usage effectively to avoid performance bottlenecks.
--In JavaScript files, optimize DOM manipulation and event handling to avoid unnecessary reflows and repaints.
+4. ComfyUI API 使用规范
+- 按照 ComfyUI 文档创建和注册节点
+- 遵循 API 指南与 ComfyUI 内部函数交互
+- JavaScript 文件遵守 ComfyUI 前端 API 规范
+- 实现标准的节点接口（RETURN_TYPES、INPUT_TYPES、FUNCTION）
+- 优化节点缓存机制（IS_CHANGED 方法）
 
-6. Error Handling and Testing
--Implement robust error handling using try-except blocks.
--Write unit tests for plugin functions using frameworks like pytest.
--In JavaScript files, use try-catch blocks for exception handling and write frontend unit tests.
+5. 性能优化
+- 编写高效的计算密集型任务代码
+- 有效管理内存使用，避免性能瓶颈
+- JavaScript 文件优化 DOM 操作和事件处理
+- 实现适当的数据缓存机制
+- 使用 ComfyUI 队列系统处理长时间运行的任务
 
-7. Documentation
--Include Chinese comments in the code to clearly express intent.
--Keep the README synchronized with the code, providing Chinese descriptions of features. When a plugin's functional module is deleted or changed, update the README accordingly to maintain high consistency between the README and the plugin.
--In JavaScript files, use JSDoc comments to describe the purpose of functions and classes.
+6. 错误处理和测试
+- 使用 try-except 实现健壮的错误处理
+- 使用 pytest 编写插件函数单元测试
+- JavaScript 文件使用 try-catch 进行异常处理
+- 提供测试工作流文件（.json）用于功能验证
 
-8. Code Reuse and Modification Checks
--When copying code from other sources, adjust variable names and references to match the current project to avoid runtime errors.
--Every code modification requires a comprehensive check of all related files, including but not limited to node registration files, utility functions, frontend JS files, configuration files, etc., to ensure modifications do not break existing functionality.
--When modifying existing files, carefully analyze the file's role and its dependencies with other files to ensure the modified code remains compatible with existing logic.
+7. 文档规范
+- 代码中包含中文注释，清晰表达意图
+- 保持 README 与代码同步，提供中文功能描述
+- 插件功能模块删除或更改时，及时更新 README
+- JavaScript 文件使用 JSDoc 注释描述函数和类的用途
+- 维护完整的 API 文档和使用示例
 
-Key Notes
--Modification Checks for Existing Files: When modifying any file, thoroughly analyze its role and dependencies with other files to ensure changes do not break existing functionality. This is critical for ensuring plugin stability and compatibility.
--Comprehensive Dependency Checks: When modifying code, check all related files (e.g., node registration files, utility functions, frontend JS files, etc.) to ensure the modified code integrates seamlessly with existing logic.
--Compatibility First: When adding new features or optimizing code, always prioritize not affecting existing functionality to ensure plugin stability and user experience.
+8. 代码复用和修改检查
+- 复用代码时，调整变量名和引用以匹配当前项目
+- 每次修改都需要全面检查相关文件
+- 修改现有文件时，仔细分析文件角色及其依赖关系
+
+9. 目录结构和文件组织
+```markdown
+project_root/
+├── __init__.py          # 主入口文件：节点注册、插件初始化
+├── config/              # 配置文件目录
+├── web/                # 前端代码目录
+│   ├── components/     # 自定义组件
+│   ├── utils/         # 前端工具函数
+│   └── index.js       # 前端入口文件
+├── nodes/              # 节点实现目录
+│   ├── [node_category]/ # 节点分类目录
+│   │   ├── __init__.py
+│   │   ├── nodes.py   
+│   │   ├── utils/     
+│   │   └── assets/    
+└── tests/              # 测试目录
+```
+
+目录规范说明：
+1. 文件命名规则
+   - Python文件使用小写字母和下划线
+   - JavaScript文件使用驼峰命名
+   - 配置文件使用小写字母和下划线
+
+2. 目录职责划分
+   - `nodes/`: 所有节点实现必须按类别组织
+   - `web/`: 前端代码严格分离，保持结构清晰
+   - `config/`: 配置文件集中管理，便于维护
+   - `tests/`: 测试用例按类型分类存放
+
+3. 资源管理
+   - 静态资源统一放在对应节点目录的 `assets/` 下
+   - 前端资源放在 `web/` 目录下
+   - 大型资源建议使用CDN或外部存储
+
+4. 文档管理
+   - 每个节点目录下必须包含 README.md
+   - 示例工作流放在对应节点的 assets 目录下
+   - API文档实时更新
+
+5. 依赖管理
+   - 使用 requirements.txt 管理Python依赖
+   - 前端依赖通过 package.json 管理
+   - 明确标注依赖版本号
+
+10. 开发日志管理
+维护三个核心日志文件：
+- CHANGELOG.md：版本更新记录
+- DEVELOPMENT.md：日常开发进度
+- TODO.md：任务管理
+
+CHANGELOG.md 格式：
+```markdown
+## [版本号] - 日期
+### 新增
+- 新功能描述
+
+### 修复
+- 问题修复描述
+
+### 变更
+- 改进描述
+```
+
+DEVELOPMENT.md 格式：
+```markdown
+# 开发日志
+
+## 日期
+### 已完成功能
+1. 功能描述
+
+### 技术决策
+- 决策内容及原因
+
+### 待解决问题
+- [ ] 问题描述
+```
+
+TODO.md 格式：
+```markdown
+# 待办事项
+
+## P0 - 核心功能
+- [ ] 任务描述（@负责人，截止日期）
+
+## P1 - 重要功能
+- [ ] 任务描述（@负责人，截止日期）
+```
+
+重要提示：
+1. 版本兼容性
+   - 明确声明支持的 ComfyUI 最低版本
+   - 列出所有外部依赖及版本
+   - 使用语义化版本号
+   - 保持向后兼容性
+
+2. 代码审查清单
+   - 检查节点接口定义完整性
+   - 验证前后端交互正确性
+   - 确认错误处理充分性
+   - 测试与其他节点的兼容性
+
+3. 开发工作流程
+   - 新功能开发前先在 TODO.md 规划
+   - 每日更新 DEVELOPMENT.md
+   - 重要更新记录到 CHANGELOG.md
+   - 保持文档与代码同步更新

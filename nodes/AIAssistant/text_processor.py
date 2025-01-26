@@ -42,6 +42,17 @@ def load_character_presets():
         print(f"[TextProcessor] 加载角色预设失败: {str(e)}")
         return ["null"]
 
+# 添加路由用于获取最新的角色预设列表
+@PromptServer.instance.routes.get("/axun-text/character-presets")
+async def get_character_presets(request):
+    """获取最新的角色预设列表"""
+    try:
+        presets = load_character_presets()
+        return web.json_response({"presets": presets})
+    except Exception as e:
+        print(f"[TextProcessor] 获取角色预设列表失败: {str(e)}")
+        return web.json_response({"presets": ["null"]})
+
 class TextProcessor:
     """文本处理器节点"""
     
@@ -66,8 +77,8 @@ class TextProcessor:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "INT")
-    RETURN_NAMES = ("scene_text", "story_text", "current_index")
+    RETURN_TYPES = ("STRING", "STRING", "INT", "INT")
+    RETURN_NAMES = ("scene_text", "story_text", "current_index", "max_scene")
     FUNCTION = "process_text"
     CATEGORY = "!Axun Nodes/AIAssistant"
 
@@ -129,7 +140,7 @@ class TextProcessor:
             if not all_matches:
                 print(f"[TextProcessor] 未找到任何匹配内容，检查文本格式是否正确")
                 print(f"[TextProcessor] 文本样本:\n{sample_text[:500]}")
-                return "", "", 1
+                return "", "", 1, 1
 
             # 提取场景和故事内容
             scene_matches = []
@@ -146,7 +157,7 @@ class TextProcessor:
             
             if not scene_matches:
                 print(f"[TextProcessor] 未找到场景内容")
-                return "", "", 1
+                return "", "", 1, 1
 
             # 获取最大索引
             def extract_index(match):
@@ -245,11 +256,11 @@ class TextProcessor:
             print(f"[TextProcessor] 设置下一个索引: {next_index}")
             self._update_index(id, next_index)
             
-            return scene_text, story_text, current_index
+            return scene_text, story_text, current_index, max_index
             
         except Exception as e:
             print(f"[TextProcessor] 处理文本时出错: {str(e)}")
-            return "", "", 1
+            return "", "", 1, 1
 
     def _update_index(self, node_id: str, index: int):
         """更新前端显示的索引值"""

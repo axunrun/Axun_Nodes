@@ -12,25 +12,32 @@ app.registerExtension({
             // 保存原始的onNodeCreated函数
             const orig_nodeCreated = nodeType.prototype.onNodeCreated;
             
-            // 保存原始的onExecuted函数
-            const orig_onExecuted = nodeType.prototype.onExecuted;
-            
             // 添加onExecuted处理
             nodeType.prototype.onExecuted = function(message) {
-                console.log("[TextCache] 节点执行:", message);
+                console.log("[TextCache] 节点执行，收到消息:", message);
                 
                 const node = this;
                 const inputTextWidget = node.widgets.find(w => w.name === 'input_text');
                 const cacheTextWidget = node.widgets.find(w => w.name === 'cache_text');
                 
+                // 检查是否有输入连接
+                const inputLink = node.inputs[0]?.link;
+                console.log("[TextCache] 输入连接状态:", inputLink);
+                
                 // 如果有输入值，更新到缓存
-                if (message && message.output && message.output.input_text) {
-                    console.log("[TextCache] 收到输入:", message.output.input_text);
+                if (message?.output?.input_text !== undefined) {
+                    const inputText = message.output.input_text;
+                    console.log("[TextCache] 收到输入文本:", inputText);
+                    
+                    // 更新输入控件
                     if (inputTextWidget) {
-                        inputTextWidget.value = message.output.input_text;
+                        inputTextWidget.value = inputText;
+                        node.onWidgetChanged(inputTextWidget);
                     }
+                    
+                    // 更新缓存控件
                     if (cacheTextWidget) {
-                        cacheTextWidget.value = message.output.input_text;
+                        cacheTextWidget.value = inputText;
                         node.onWidgetChanged(cacheTextWidget);
                         
                         // 同步到后端
@@ -39,15 +46,10 @@ app.registerExtension({
                             {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ text: message.output.input_text })
+                                body: JSON.stringify({ text: inputText })
                             }
                         ).catch(err => console.error("[TextCache] 设置缓存失败:", err));
                     }
-                }
-                
-                // 调用原始的onExecuted
-                if (orig_onExecuted) {
-                    orig_onExecuted.apply(this, arguments);
                 }
             };
             
