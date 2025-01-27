@@ -1,5 +1,5 @@
 # 版本信息
-VERSION = "1.02"
+VERSION = "1.05"
 
 import os
 import sys
@@ -64,6 +64,7 @@ from .nodes.AIAssistant.text_merger import TextMerger
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
+from .nodes.Translator.auto_translator_box import AutoTranslatorBox
 
 # Lotus节点组
 from .nodes.Lotus.lotus_nodes import LoadLotusModel, LotusSampler
@@ -100,6 +101,7 @@ NODE_CLASS_MAPPINGS = {
     
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
+    "AutoTranslatorBox": AutoTranslatorBox,
     
     # Lotus节点组
     "LoadLotusModel": LoadLotusModel,
@@ -134,6 +136,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",
+    "AutoTranslatorBox": "📝 Auto Translator Box",
     
     # Lotus节点组
     "LoadLotusModel": "🧠 Load Lotus Model",
