@@ -106,7 +106,8 @@ app.registerExtension({
                 // 调整控件顺序
                 const widgets = node.widgets;
                 const appstartTextWidget = widgets.find(w => w.name === 'appstart_text');
-                const sampleTextWidget = widgets.find(w => w.name === 'sample_text');
+                const sampleStoryWidget = widgets.find(w => w.name === 'sample_story');
+                const sampleCharacterWidget = widgets.find(w => w.name === 'sample_character');
                 
                 // 重新排序控件
                 const orderedWidgets = [];
@@ -118,7 +119,8 @@ app.registerExtension({
                 
                 // 添加其他控件
                 if (appstartTextWidget) orderedWidgets.push(appstartTextWidget);
-                if (sampleTextWidget) orderedWidgets.push(sampleTextWidget);
+                if (sampleStoryWidget) orderedWidgets.push(sampleStoryWidget);
+                if (sampleCharacterWidget) orderedWidgets.push(sampleCharacterWidget);
                 
                 // 添加剩余的控件
                 widgets.forEach(widget => {

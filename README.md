@@ -1,4 +1,4 @@
-# Axun Nodes - ComfyUI 插件 v1.04
+# Axun Nodes - ComfyUI 插件 v1.05
 
 Axun Nodes 是一个用于ComfyUI的插件，提供AI助手、路径处理、队列触发、SUPIR超分和翻译功能。
 
@@ -161,6 +161,18 @@ axun_nodes/
      - 根据场景角色自动筛选和添加相关角色信息
      - 支持文本拼接和格式化
      - 自动计算并输出最大场景编号
+
+4. **Image Selector**: 图像选择器节点
+   - 输入: 
+     - 图像A (image_a)
+     - 图像B (image_b)
+   - 输出: 
+     - 选中的图像 (image)
+   - 功能: 
+     - 当图像A有输入时，输出图像A
+     - 当图像A无输入时，输出图像B
+     - 自动处理图像连接状态
+     - 适用于需要图像备选的场景
 
 ### 队列工具节点
 1. **Queue Trigger**: 队列触发节点
@@ -344,6 +356,16 @@ graph LR
 - 使用队列工具实现断点续处理
 
 ## 更新日志
+
+### v1.05 (2024-03-22)
+- 新增 Image Selector 节点，支持图像选择和备选功能
+- 优化 Text Processor 节点的文本处理功能
+  - 新增 story_name 输出，支持中英文标题组合
+  - 新增 story_cover 输出，支持封面提示词生成
+  - 新增 story_summary 输出，支持中英文摘要
+  - 新增 scene_index 和 story_index 输出
+  - 优化 story_text 为 story_text_cn 和 story_text_en 双语输出
+- 改进 Auto Translator Box 节点的翻译显示效果
 
 ### v1.04 (2024-03-21)
 - 新增 Text Processor 节点,支持文本拼接和计数功能
