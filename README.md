@@ -14,6 +14,10 @@ axun_nodes/
 │   │   ├── AIAssistant.py   # AI助手节点实现
 │   │   ├── preset_node.py   # 预设节点实现
 │   │   ├── text_processor.py # 文本处理节点
+│   │   ├── text_selector.py  # 文本选择器节点
+│   │   ├── image_selector.py # 图像选择器节点
+│   │   ├── text_cache.py    # 文本缓存节点
+│   │   ├── number_generator.py # 数字生成器节点
 │   │   └── utils/           # 工具函数目录
 │   │       ├── api_handler.py  # API处理器
 │   │       ├── image_utils.py  # 图像工具
@@ -25,6 +29,7 @@ axun_nodes/
 │   │   ├── queue_trigger.py  # 队列触发节点
 │   │   └── work_mode.py     # 工作模式节点
 │   ├── Translator/        # 翻译功能节点
+│   │   ├── auto_translator_box.py # 自动翻译文本框节点
 │   │   ├── translator_node.py # 翻译节点实现
 │   │   ├── utils/            # 翻译工具
 │   │   │   ├── translator_utils.py # 翻译工具函数
@@ -108,17 +113,22 @@ axun_nodes/
 ### 模块分析
 
 1. **AI助手模块**
-   - AIAssistant: 提供AI对话功能,支持多种预设角色
+   - AIAssistant: 提供AI对话功能，支持多种预设角色
    - PresetNode: 管理和应用预设配置
-   - TextProcessor: 文本处理节点,支持文本拼接、计数和格式化
+   - TextProcessor: 文本处理节点，支持文本拼接、计数和格式化
+   - TextSelector: 文本选择器，支持多输入优先级选择
+   - ImageSelector: 图像选择器，支持多图像优先级选择
+   - TextCache: 文本缓存管理，支持临时存储和清除
+   - NumberGenerator: 数字生成器，支持自定义范围和格式
 
 2. **队列工具模块**
-   - QueueTrigger: 队列触发器,控制工作流执行顺序
-   - PathProcessor: 路径处理工具,支持文件路径操作
-   - DirPicker: 目录选择器,用于选择和管理工作目录
-   - WorkMode: 工作模式控制器,切换不同的处理模式
+   - QueueTrigger: 队列触发器，控制工作流执行顺序
+   - PathProcessor: 路径处理工具，支持文件路径操作
+   - DirPicker: 目录选择器，用于选择和管理工作目录
+   - WorkMode: 工作模式控制器，切换不同的处理模式
 
 3. **翻译模块**
+   - AutoTranslatorBox: 自动翻译文本框，支持实时翻译显示
    - Translator: 支持多语言翻译功能
    - TranslatorUtils: 翻译相关的工具函数
 
@@ -129,50 +139,85 @@ axun_nodes/
 
 ## 功能节点说明
 
-### AI助手节点
-1. **AI Assistant Chat**: AI对话节点
-   - 输入: 用户消息、系统提示、历史记录
-   - 输出: AI回复、完整对话历史
-   - 功能: 支持连续对话、角色扮演、上下文记忆
+### AI助手节点组
 
-2. **Preset Manager**: 预设管理节点
-   - 输入: 预设名称、自定义参数
-   - 输出: 预设配置、系统提示
-   - 功能: 加载和管理预设配置
+#### Text Processor 节点 (📝)
+- 功能：AI辅助文本处理和生成
+- 输入：
+  - system_prompt: 系统提示词
+  - user_prompt: 用户提示词
+  - sample_character: 角色示例
+  - style_preset: 风格预设
+  - scene_preset: 场景预设
+  - shot_preset: 镜头预设
+- 输出：
+  - story_cover: 封面描述
+  - story_summary: 故事概要
+  - scene_text: 场景文本
+- 说明：支持中英双语输出，自动优化格式
 
-3. **Text Processor**: 文本处理节点
-   - 输入: 
-     - 文本内容 (sample_text)
-     - 前置文本 (appstart_text)
-     - 后置文本 (append_text)
-     - 内容类型过滤 (content_type)
-     - 前缀后缀 (prefix, suffix)
-     - 文本索引 (text_index)
-     - 角色预设 (character_a/b/c_preset)
-   - 输出: 
-     - 场景文本 (scene_text)
-     - 故事文本 (story_text)
-     - 当前索引 (current_index)
-     - 最大场景数 (max_scene)
-   - 功能: 
-     - 支持通过 content_type 参数筛选特定内容 (如 "scene_*,story_*")
-     - 自动递增文本索引，达到最大值后重置
-     - 智能提取大括号内的内容，去除标识符
-     - 根据场景角色自动筛选和添加相关角色信息
-     - 支持文本拼接和格式化
-     - 自动计算并输出最大场景编号
+#### Text Selector 节点 (🔀)
+- 功能：按优先级选择输入文本
+- 输入：
+  - text1: 最高优先级文本
+  - text2: 次优先级文本
+  - text3: 第三优先级文本
+  - text4: 最低优先级文本
+- 输出：
+  - selected_text: 选中的文本
+- 说明：按优先级顺序选择非空文本输入
 
-4. **Image Selector**: 图像选择器节点
-   - 输入: 
-     - 图像A (image_a)
-     - 图像B (image_b)
-   - 输出: 
-     - 选中的图像 (image)
-   - 功能: 
-     - 当图像A有输入时，输出图像A
-     - 当图像A无输入时，输出图像B
-     - 自动处理图像连接状态
-     - 适用于需要图像备选的场景
+#### Image Selector 节点 (🔄)
+- 功能：按优先级选择输入图像
+- 输入：
+  - image_a: 最高优先级图像
+  - image_b: 次优先级图像
+  - image_c: 最低优先级图像
+- 输出：
+  - image: 选中的图像
+- 说明：按优先级顺序选择有效图像输入
+
+#### Text Cache 节点 (📋)
+- 功能：文本内容缓存管理
+- 输入：
+  - text: 待缓存文本
+  - clear: 清除触发器
+- 输出：
+  - text: 缓存文本
+- 说明：支持文本暂存和清除操作
+
+#### Number Generator 节点 (🔢)
+- 功能：生成自定义格式的数字
+- 输入：
+  - start: 起始数字
+  - end: 结束数字
+  - step: 步长
+  - format: 输出格式
+- 输出：
+  - number: 生成的数字
+- 说明：支持自定义范围和格式的数字生成
+
+#### AI Assistant Preset 节点 (⚙️)
+- 功能：AI助手预设管理
+- 特性：
+  - 系统预设：基础行为定义
+  - 风格预设：文风样式定义
+  - 场景预设：场景描述模板
+  - 镜头预设：视角描述模板
+  - 角色预设：人物特征定义
+- 说明：支持预设的导入导出
+
+### Translator 节点组
+
+#### Auto Translator Box 节点 (🌐)
+- 功能：自动文本翻译
+- 特性：
+  - 支持多种翻译服务
+  - 批量翻译能力
+  - 自动语言检测
+  - 翻译缓存机制
+  - 节点内实时显示
+- 说明：适用于大规模文本翻译
 
 ### 队列工具节点
 1. **Queue Trigger**: 队列触发节点
@@ -289,130 +334,52 @@ graph LR
    - 添加进度显示
    - 合理设置默认参数
 
-## 安装
-1. 将本插件目录放入ComfyUI的`custom_nodes`目录
-2. 安装依赖：`pip install -r requirements.txt`
-   - Python 3.10+
-   - PyTorch 2.0+
-   - xformers (可选，用于加速)
-   - transformers
-   - omegaconf
-   - einops
-   - requests
-3. 确保已安装tkinter：
-   - Windows: 通常已预装
-   - macOS: `brew install python-tk`
-   - Linux: `sudo apt install python3-tk`
-4. 下载 SUPIR 模型（可选）：
-   - 从 [Hugging Face](https://huggingface.co/camenduru/SUPIR) 下载模型文件
-   - 将模型文件放置在 `ComfyUI/models/supir` 目录下
-5. 下载 Lotus 模型（可选）：
-   - 从 [Hugging Face](https://huggingface.co/Kijai/lotus-comfyui/tree/main) 下载模型文件
-   - 将模型文件放置在 `ComfyUI/models/diffusion_models` 目录下
-6. 配置 AI Assistant（必需）：
-   - 编辑 `config/AIAssistant_config.json` 文件
-   - 填入相应的API密钥和配置信息
-7. 配置翻译功能（可选）：
-   - 编辑 `config/translator.json` 文件
-   - 填入百度翻译API密钥
-8. 重启ComfyUI
+## 安装说明
 
-## 使用技巧
+1. 克隆仓库到 ComfyUI 的 custom_nodes 目录
+```bash
+cd custom_nodes
+git clone https://github.com/yourusername/axun_nodes.git
+```
 
-### 1. 文本处理优化
-- 使用 Text Processor 节点进行文本拼接时,可以设置自动计数功能
-- 计数器支持自动递增、手动控制等多种模式
-- 可以通过格式化功能统一文本输出格式
-- 支持多个文本处理节点串联使用
+2. 安装依赖
+```bash
+pip install -r requirements.txt
+```
 
-### 2. 队列工具使用
-- Path Processor 支持正则表达式和扩展名两种过滤方式
-- 使用 Queue Trigger 可以精确控制工作流执行顺序
-- Work Mode 节点可以快速切换批处理和单文件模式
-- Directory Picker 支持保存常用目录路径
+3. 重启 ComfyUI
 
-### 3. AI助手应用
-- 使用预设管理器可以快速切换不同场景
-- 支持连续对话,保持上下文连贯性
-- 可以通过参数调整来控制输出的创造性
-- 支持中英文混合输入和多轮对话
+## 使用说明
 
-### 4. 翻译功能
-- 双击文本框即可触发翻译
-- 支持中英文自动识别和互译
-- 翻译请求具有防抖功能,避免频繁API调用
-- 可以配置自己的API密钥
+1. 在节点菜单中查找对应的节点组：
+   - !Axun Nodes/AIAssistant
+   - !Axun Nodes/Translator
+   - !Axun Nodes/Qtools
 
-### 5. SUPIR超分应用
-- 支持多种超分倍率,可根据需求选择
-- 提供不同的内存模式,平衡性能和显存占用
-- 可以通过分块处理来支持大尺寸图像
-- 支持批量处理多张图像
+2. 根据需要选择并添加节点到工作流
 
-### 6. 性能优化建议
-- 合理使用批处理模式提高效率
-- 适当调整分块大小和重叠区域
-- 根据显存大小选择合适的内存模式
-- 使用队列工具实现断点续处理
+3. 按照节点说明配置参数
+
+4. 运行工作流
+
+## 注意事项
+
+1. 确保 ComfyUI 版本兼容（推荐使用最新版本）
+2. 部分节点可能需要额外的API密钥或服务配置
+3. 使用前请阅读节点说明和示例工作流
+4. 定期更新插件以获取最新功能和修复
+
+## 贡献指南
+
+1. 欢迎提交 Issue 和 Pull Request
+2. 代码提交请遵循项目编码规范
+3. 新功能请提供完整的文档和示例
+
+## 许可证
+
+MIT License
 
 ## 更新日志
 
-### v1.05 (2024-03-22)
-- 新增 Image Selector 节点，支持图像选择和备选功能
-- 优化 Text Processor 节点的文本处理功能
-  - 新增 story_name 输出，支持中英文标题组合
-  - 新增 story_cover 输出，支持封面提示词生成
-  - 新增 story_summary 输出，支持中英文摘要
-  - 新增 scene_index 和 story_index 输出
-  - 优化 story_text 为 story_text_cn 和 story_text_en 双语输出
-- 改进 Auto Translator Box 节点的翻译显示效果
-
-### v1.04 (2024-03-21)
-- 新增 Text Processor 节点,支持文本拼接和计数功能
-- 优化 AI Assistant 节点的对话体验
-- 改进 Queue Trigger 的计数器功能
-- 更新依赖包版本,提高稳定性
-- 修复已知bug
-
-### v1.03 (2024-03-15)
-- 新增 SUPIR 超分辨率处理功能
-- 优化批处理模式的性能
-- 改进文件路径处理逻辑
-- 更新模型加载机制
-- 修复内存泄漏问题
-
-### v1.02 (2024-03-10)
-- 新增翻译功能,支持中英互译
-- 优化工作流触发机制
-- 改进预设管理系统
-- 更新用户界面交互
-- 修复路径处理bug
-
-### v1.01 (2024-03-05)
-- 新增 AI Assistant 预设功能
-- 优化队列工具性能
-- 改进错误处理机制
-- 更新配置文件结构
-- 修复多线程问题
-
-### v1.00 (2024-03-01)
-- 首次发布
-- 基础功能实现
-- AI助手系统
-- 队列工具
-- 路径处理
-
-## 贡献
-欢迎提交Pull Request。对于重大更改，请先创建issue讨论。
-
-## 许可证
-[MIT](LICENSE)
-
----
-
-# Axun Nodes - ComfyUI Plugin
-
-[English version follows...]
-
-[Previous English content remains unchanged]
+详细更新历史请查看 [CHANGELOG.md](CHANGELOG.md)
 

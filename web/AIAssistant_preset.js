@@ -69,11 +69,15 @@ async function updatePresets(node) {
 
         // 获取所有widgets
         const systemPresetWidget = node.widgets.find((w) => w.name === "system_preset");
+        const stylePromptWidget = node.widgets.find((w) => w.name === "style_prompt");
         const stylePresetWidget = node.widgets.find((w) => w.name === "style_preset");
         const shotPresetWidget = node.widgets.find((w) => w.name === "shot_preset");
         const characterAPresetWidget = node.widgets.find((w) => w.name === "character_a_preset");
         const characterBPresetWidget = node.widgets.find((w) => w.name === "character_b_preset");
         const characterCPresetWidget = node.widgets.find((w) => w.name === "character_c_preset");
+        const storyPromptWidget = node.widgets.find((w) => w.name === "story_prompt");
+        const seedModeWidget = node.widgets.find(w => w.name === "seed_mode");
+        const seedWidget = node.widgets.find(w => w.name === "seed");
         
         // 更新系统预设
         if (systemPresetWidget) {
@@ -323,13 +327,13 @@ app.registerExtension({
 
                 // 获取所有widgets
                 const systemPresetWidget = this.widgets.find((w) => w.name === "system_preset");
-                const customSystemWidget = this.widgets.find((w) => w.name === "custom_system");
+                const stylePromptWidget = this.widgets.find((w) => w.name === "style_prompt");
                 const stylePresetWidget = this.widgets.find((w) => w.name === "style_preset");
                 const shotPresetWidget = this.widgets.find((w) => w.name === "shot_preset");
                 const characterAPresetWidget = this.widgets.find((w) => w.name === "character_a_preset");
                 const characterBPresetWidget = this.widgets.find((w) => w.name === "character_b_preset");
                 const characterCPresetWidget = this.widgets.find((w) => w.name === "character_c_preset");
-                const customPromptWidget = this.widgets.find((w) => w.name === "custom_prompt");
+                const storyPromptWidget = this.widgets.find((w) => w.name === "story_prompt");
                 const seedModeWidget = this.widgets.find(w => w.name === "seed_mode");
                 const seedWidget = this.widgets.find(w => w.name === "seed");
 
@@ -400,8 +404,8 @@ app.registerExtension({
                             
                             if (!formData.name) {
                                 alert("请输入预设名称");
-                        return;
-                    }
+                                return;
+                            }
 
                             const success = await PresetService.savePreset("style", formData);
                             if (success) {
@@ -416,11 +420,11 @@ app.registerExtension({
                     widgets.push(editButton);
 
                     // 添加自定义风格输入框
-                    if (customSystemWidget) {
-                        customSystemWidget.type = "textarea";
-                        customSystemWidget.options = customSystemWidget.options || {};
-                        customSystemWidget.options.multiline = true;
-                        widgets.push(customSystemWidget);
+                    if (stylePromptWidget) {
+                        stylePromptWidget.type = "textarea";
+                        stylePromptWidget.options = stylePromptWidget.options || {};
+                        stylePromptWidget.options.multiline = true;
+                        widgets.push(stylePromptWidget);
                     }
                 }
 
@@ -446,15 +450,15 @@ app.registerExtension({
                             
                             if (!formData.name) {
                                 alert("请输入预设名称");
-                        return;
-                    }
+                                return;
+                            }
 
                             const success = await PresetService.savePreset("shot", formData);
-                    if (success) {
+                            if (success) {
                                 await updatePresets(this);
                                 shotPresetWidget.value = formData.name;
                                 dialog.close();
-                    } else {
+                            } else {
                                 alert("保存预设失败");
                             }
                         };
@@ -506,11 +510,11 @@ app.registerExtension({
                 widgets.push(editCharacterButton);
 
                 // 添加自定义提示词输入框
-                if (customPromptWidget) {
-                    customPromptWidget.type = "textarea";
-                    customPromptWidget.options = customPromptWidget.options || {};
-                    customPromptWidget.options.multiline = true;
-                    widgets.push(customPromptWidget);
+                if (storyPromptWidget) {
+                    storyPromptWidget.type = "textarea";
+                    storyPromptWidget.options = storyPromptWidget.options || {};
+                    storyPromptWidget.options.multiline = true;
+                    widgets.push(storyPromptWidget);
                 }
 
                 // 添加种子控制

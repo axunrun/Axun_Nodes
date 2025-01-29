@@ -60,7 +60,7 @@ from .nodes.AIAssistant.preset_node import AIAssistantPreset
 from .nodes.AIAssistant.text_processor import TextProcessor
 from .nodes.AIAssistant.number_generator import NumberGenerator
 from .nodes.AIAssistant.text_cache import TextCache
-from .nodes.AIAssistant.text_merger import TextMerger
+from .nodes.AIAssistant.text_selector import TextSelector
 from .nodes.AIAssistant.image_selector import ImageSelector
 
 # 翻译节点组
@@ -98,7 +98,7 @@ NODE_CLASS_MAPPINGS = {
     "TextProcessor": TextProcessor,
     "NumberGenerator": NumberGenerator,
     "TextCache": TextCache,
-    "TextMerger": TextMerger,
+    "TextSelector": TextSelector,
     "ImageSelector": ImageSelector,
     
     # 翻译节点组
@@ -134,7 +134,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextProcessor": "📝 Text Processor",
     "NumberGenerator": "🔢 Number Generator",
     "TextCache": "📝 Text Cache",
-    "TextMerger": "🔀 Text Merger",
+    "TextSelector": "🔀 Text Selector",
     "ImageSelector": "🔄 Image Selector",
     
     # 翻译节点组

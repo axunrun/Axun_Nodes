@@ -82,9 +82,9 @@ class TextProcessor:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "INT", "INT")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "INT", "INT")
     RETURN_NAMES = ('story_name', 'story_cover', 'story_summary', 'scene_index', 'scene_text', 'story_index', 
-                   'story_text_cn', 'story_text_en', 'character_name', 'current_index', 'max_scene')
+                   'story_text_cn', 'story_text_en', 'character_name', 'character_text', 'current_index', 'max_scene')
     INPUT_IS_LIST = False
     OUTPUT_NODE = True
     FUNCTION = "process_text"
@@ -173,6 +173,39 @@ class TextProcessor:
             print(f"[TextProcessor] 提取故事信息失败: {str(e)}")
             return {}
 
+    def extract_character_text(self, text: str) -> str:
+        """提取角色描述文本"""
+        try:
+            print(f"[TextProcessor] 开始提取角色描述")
+            
+            # 提取完整的角色信息，包括标题
+            full_text = []
+            
+            # 提取Character name部分
+            name_match = re.search(r'Character name:\s*\n([^#]*?)(?=\n\s*Character prompts:|$)', text, re.DOTALL)
+            if name_match:
+                name_text = name_match.group(1).strip()
+                full_text.extend(["Character name:", name_text])
+            
+            # 提取Character prompts部分
+            prompts_match = re.search(r'Character prompts:\s*\n(.*?)(?=\n\s*$|\}|$)', text, re.DOTALL)
+            if prompts_match:
+                prompts_text = prompts_match.group(1).strip()
+                if full_text:  # 如果已经有name部分，添加空行
+                    full_text.append("")
+                full_text.extend(["Character prompts:", prompts_text])
+            
+            if full_text:
+                character_text = "\n".join(full_text)
+                print(f"[TextProcessor] 成功提取角色描述，长度: {len(character_text)}")
+                return character_text
+            
+            print("[TextProcessor] 未找到角色描述")
+            return ""
+        except Exception as e:
+            print(f"[TextProcessor] 提取角色描述失败: {str(e)}")
+            return ""
+
     def process_text(self, appstart_text: str, append_text: str, content_type: str, 
                     prefix: str, suffix: str, text_index: int, 
                     character_a_preset: str, character_b_preset: str, character_c_preset: str,
@@ -191,8 +224,11 @@ class TextProcessor:
                 cleaned_lines = [line.lstrip() for line in lines]
                 return '\n'.join(cleaned_lines)
             
-            # 提取角色名称
+            # 提取角色名称和描述
             character_name = self.extract_character_name(sample_character)
+            character_text = self.extract_character_text(sample_character)
+            print(f"[TextProcessor] 提取的角色名称: {character_name}")
+            print(f"[TextProcessor] 提取的角色描述长度: {len(character_text)}")
             
             # 提取故事信息
             story_info = self.extract_story_info(sample_story)
@@ -241,7 +277,7 @@ class TextProcessor:
             
             # 如果没有故事内容，返回空结果但保留已处理的信息
             if not sample_story.strip():
-                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, text_index, 1
+                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, character_text, text_index, 1
             
             # 分析文本内容
             content_types = [t.strip() for t in content_type.split(',')]
@@ -262,7 +298,7 @@ class TextProcessor:
                 all_matches.extend(matches)
             
             if not all_matches:
-                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, text_index, 1
+                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, character_text, text_index, 1
             
             # 提取场景和故事内容
             scene_matches = []
@@ -275,7 +311,7 @@ class TextProcessor:
                     story_matches.append(match)
             
             if not scene_matches:
-                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, text_index, 1
+                return story_name, story_cover, story_summary, "", "", "", "", "", character_name, character_text, text_index, 1
             
             # 获取最大索引
             def extract_index(match):
@@ -366,12 +402,12 @@ class TextProcessor:
                 print(f"[TextProcessor] 更新索引: {current_index} -> {next_index}")
             
             return (story_name, story_cover, story_summary, scene_index, scene_text, 
-                   story_index, story_text_cn, story_text_en, character_name, 
+                   story_index, story_text_cn, story_text_en, character_name, character_text, 
                    current_index, max_index)
             
         except Exception as e:
             print(f"[TextProcessor] 处理文本时出错: {str(e)}")
-            return "", "", "", "", "", "", "", "", character_name, text_index, 1
+            return "", "", "", "", "", "", "", "", character_name, "", text_index, 1
 
     def _update_index(self, node_id: str, index: int):
         """更新节点索引"""

@@ -153,13 +153,13 @@ class AIAssistantPreset:
             return {
                 "required": {
                     "system_preset": (list(presets.get("system_presets", {}).keys()),),
-                    "custom_system": ("STRING", {"multiline": True}),
+                    "style_prompt": ("STRING", {"multiline": True}),
                     "style_preset": (list(presets.get("style_presets", {}).keys()),),
                     "shot_preset": (list(presets.get("shot_presets", {}).keys()),),
                     "character_a_preset": (character_presets,),
                     "character_b_preset": (character_presets,),
                     "character_c_preset": (character_presets,),
-                    "custom_prompt": ("STRING", {"multiline": True}),
+                    "story_prompt": ("STRING", {"multiline": True}),
                     "seed_mode": (["fixed", "increment", "decrement", "randomize"],),
                     "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 }
@@ -172,13 +172,13 @@ class AIAssistantPreset:
             return {
                 "required": {
                     "system_preset": (list(default_config["system_presets"].keys()),),
-                    "custom_system": ("STRING", {"multiline": True}),
+                    "style_prompt": ("STRING", {"multiline": True}),
                     "style_preset": (list(default_config["style_presets"].keys()),),
                     "shot_preset": (list(default_config["shot_presets"].keys()),),
                     "character_a_preset": (character_presets,),
                     "character_b_preset": (character_presets,),
                     "character_c_preset": (character_presets,),
-                    "custom_prompt": ("STRING", {"multiline": True}),
+                    "story_prompt": ("STRING", {"multiline": True}),
                     "seed_mode": (["fixed", "increment", "decrement", "randomize"],),
                     "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})
                 }
@@ -190,9 +190,9 @@ class AIAssistantPreset:
     OUTPUT_NODE = True
     CATEGORY = "!Axun Nodes/AIAssistant"
 
-    def apply_preset(self, system_preset, custom_system, style_preset, shot_preset, 
+    def apply_preset(self, system_preset, style_prompt, style_preset, shot_preset, 
                     character_a_preset, character_b_preset, character_c_preset, 
-                    custom_prompt, seed_mode, seed):
+                    story_prompt, seed_mode, seed):
         """应用预设配置并组合输出"""
         presets = self.load_presets()
         
@@ -206,15 +206,17 @@ class AIAssistantPreset:
         prompt_parts = []
         
         # 添加风格预设和自定义风格
-        style_prompt = presets["style_presets"].get(style_preset, {}).get("prompt", "").strip()
-        custom_style_text = custom_system.strip()
-        
-        if style_preset != "null" or custom_style_text:
-            style_parts = []
-            if style_preset != "null" and style_prompt:
-                style_parts.append(style_prompt)
-            if custom_style_text:
-                style_parts.append(custom_style_text)
+        style_parts = []
+        # 添加预设风格
+        if style_preset != "null":
+            preset_style = presets["style_presets"].get(style_preset, {}).get("prompt", "").strip()
+            if preset_style:
+                style_parts.append(preset_style)
+        # 添加自定义风格
+        if style_prompt.strip():
+            style_parts.append(style_prompt.strip())
+        # 如果有风格内容，添加到提示词中
+        if style_parts:
             prompt_parts.append(f"Style:\n{', '.join(style_parts)}")
         
         # 添加镜头预设
@@ -236,8 +238,8 @@ class AIAssistantPreset:
                     prompt_parts.append(f"{role_prefix}:\n{char_prompt}")
         
         # 添加自定义提示词（直接添加原文）
-        if custom_prompt.strip():
-            prompt_parts.append(custom_prompt.strip())
+        if story_prompt.strip():
+            prompt_parts.append(story_prompt.strip())
         
         # 组合最终用户提示词，使用双换行符分隔段落
         user_prompt = "\n\n".join(prompt_parts) if prompt_parts else ""
