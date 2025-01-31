@@ -125,6 +125,7 @@ axun_nodes/
    - QueueTrigger: 队列触发器，控制工作流执行顺序
    - PathProcessor: 路径处理工具，支持文件路径操作
    - DirPicker: 目录选择器，用于选择和管理工作目录
+   - Directory Opener: 目录打开器，用于一键打开指定目录
    - WorkMode: 工作模式控制器，切换不同的处理模式
 
 3. **翻译模块**
@@ -207,6 +208,18 @@ axun_nodes/
   - 角色预设：人物特征定义
 - 说明：支持预设的导入导出
 
+#### Story Extractor 节点 (📖)
+- 功能：提取中文故事内容
+- 输入：
+  - sample_story: 原始故事文本（包含中英文和格式信息）
+- 显示：
+  - extracted_text: 提取的中文内容（包括标题、简介和章节内容）
+- 说明：
+  - 自动提取故事标题和简介
+  - 按章节顺序整理内容
+  - 支持多章节故事提取
+  - 实时显示提取结果
+
 ### Translator 节点组
 
 #### Auto Translator Box 节点 (🌐)
@@ -235,7 +248,20 @@ axun_nodes/
    - 输出: 选中的目录路径
    - 功能: 目录浏览和选择
 
-4. **Work Mode**: 工作模式节点
+4. **Directory Opener**: 目录打开器节点
+   - 输入: 
+     - character_dir: 角色目录路径
+     - story_dir: 故事目录路径
+     - cover_dir: 封面目录路径
+     - animation_dir: 动画目录路径
+     - other_dir: 其他目录路径
+   - 功能: 
+     - 一键打开指定目录
+     - 支持多个目录同时管理
+     - 自动验证目录有效性
+     - 跨平台支持(Windows/macOS/Linux)
+
+5. **Work Mode**: 工作模式节点
    - 输入: 模式选择、参数配置
    - 输出: 模式状态
    - 功能: 切换不同工作模式
