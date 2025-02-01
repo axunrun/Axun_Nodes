@@ -85,6 +85,14 @@ class TextCache:
     RETURN_NAMES = ("output_text",)
     FUNCTION = "process_text"
     CATEGORY = "!Axun Nodes/AIAssistant"
+    OUTPUT_NODE = True
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, input_text: str = "", cache_text: str = "", id: str = None):
+        """验证输入
+        即使输入为空也返回True，因为这是一个可选输入的节点
+        """
+        return True
 
     def process_text(self, input_text: str = "", cache_text: str = "", id: str = None):
         """处理文本内容"""

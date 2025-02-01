@@ -144,6 +144,9 @@
         },
         "狐狸爸爸:Finn": {
             "prompt": "##Finn:{\nCharacter name:\nfox father: Finn\n\nCharacter prompts:\nFinn is a 5-foot-8-inch anthropomorphic fox with a slender, athletic build, a bushy auburn tail with a white tip, and short, tawny-orange fur covering his body. He has a pointed snout with a small black nose, triangular ears with white tufts at the tips, and almond-shaped amber eyes behind round, gold-framed glasses with thin wire rims. He wears a crisp white button-up shirt with rolled-up sleeves, tailored tan trousers with a leather belt, and polished brown loafers. His hands are covered in smooth, pristine white gloves made of finely woven cotton. Around his neck is a loose-knit, dark mustard-yellow scarf with a subtle herringbone pattern. His most distinctive feature is the small wooden pipe he occasionally holds in his gloved hand.\n}"
+        },
+        "熊猫爸爸:Bailey": {
+            "prompt": "##Bailey:{\nCharacter name:\npanda father: Bailey\n\nCharacter prompts:\nBailey is a 6-foot tall, panda with a stocky build, mature in appearance to fit the role of a father, his fur is soft ebony black and creamy white, he has round ears that are fluffy to the touch, almond-shaped eyes circled by deep forest green eye rings, large paws with thick ivory-colored claws for holding objects and cuddling, muscular legs for stability and strength, Bailey wears a comfortable woolen cloak dyed vibrant royal blue with golden trim and embroidered floral patterns, beneath it he has on snug linen trousers in dark charcoal gray with belt made of polished brass featuring engraved leaves, and brown leather boots cuffed at the top to keep out the cold, accessorized with a simple silver band around his left wrist that reflects light subtly.\n}"
         }
     }
 }

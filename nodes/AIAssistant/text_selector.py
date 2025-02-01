@@ -9,10 +9,11 @@ class TextSelector:
         """定义节点输入类型"""
         return {
             "optional": {
-                "text1": ("STRING", {"multiline": True}),
-                "text2": ("STRING", {"multiline": True}),
-                "text3": ("STRING", {"multiline": True}),
-                "text4": ("STRING", {"multiline": True}),
+                "text1": ("STRING", {"multiline": True}),  # 最高优先级文本
+                "text2": ("STRING", {"multiline": True}),  # 第二优先级文本
+                "text3": ("STRING", {"multiline": True}),  # 第三优先级文本
+                "text4": ("STRING", {"multiline": True}),  # 第四优先级文本
+                "text5": ("STRING", {"multiline": True}),  # 第五优先级文本
             }
         }
     
@@ -23,12 +24,16 @@ class TextSelector:
     RETURN_NAMES = ("selected_text",)
     
     def select_text(self, **kwargs) -> tuple[str]:
-        """按优先级选择文本的主要逻辑"""
+        """按优先级选择文本的主要逻辑
+        优先级：text1 > text2 > text3 > text4 > text5
+        如果高优先级文本为空，则尝试使用下一优先级的文本
+        所有文本都为空时返回空字符串
+        """
         try:
             print("[TextSelector] 开始处理文本")
             
             # 按优先级顺序检查文本
-            for i in range(1, 5):
+            for i in range(1, 6):
                 text_key = f"text{i}"
                 if text_key in kwargs and kwargs[text_key] is not None and kwargs[text_key].strip():
                     selected_text = kwargs[text_key].strip()

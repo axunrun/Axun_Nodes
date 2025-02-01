@@ -108,6 +108,8 @@ app.registerExtension({
                 const appstartTextWidget = widgets.find(w => w.name === 'appstart_text');
                 const sampleStoryWidget = widgets.find(w => w.name === 'sample_story');
                 const sampleCharacterWidget = widgets.find(w => w.name === 'sample_character');
+                const sampleCoverWidget = widgets.find(w => w.name === 'sample_cover');
+                const inPathWidget = widgets.find(w => w.name === 'in_path');
                 
                 // 重新排序控件
                 const orderedWidgets = [];
@@ -121,6 +123,8 @@ app.registerExtension({
                 if (appstartTextWidget) orderedWidgets.push(appstartTextWidget);
                 if (sampleStoryWidget) orderedWidgets.push(sampleStoryWidget);
                 if (sampleCharacterWidget) orderedWidgets.push(sampleCharacterWidget);
+                if (sampleCoverWidget) orderedWidgets.push(sampleCoverWidget);
+                if (inPathWidget) orderedWidgets.push(inPathWidget);
                 
                 // 添加剩余的控件
                 widgets.forEach(widget => {

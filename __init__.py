@@ -53,6 +53,7 @@ from .nodes.Qtools.dir_picker import DirPicker
 from .nodes.Qtools.path_processor import PathProcessor
 from .nodes.Qtools.queue_trigger import ImpactQueueTriggerCountdown
 from .nodes.Qtools.work_mode import WorkMode
+from .nodes.Qtools.dir_opener import DirOpener
 
 # AI助手节点组
 from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAPI, DeepSeekLLMAPI
@@ -62,6 +63,7 @@ from .nodes.AIAssistant.number_generator import NumberGenerator
 from .nodes.AIAssistant.text_cache import TextCache
 from .nodes.AIAssistant.text_selector import TextSelector
 from .nodes.AIAssistant.image_selector import ImageSelector
+from .nodes.AIAssistant.story_extractor import StoryExtractor
 
 # 翻译节点组
 from .nodes.Translator.translator_node import TranslatorNode
@@ -89,6 +91,7 @@ NODE_CLASS_MAPPINGS = {
     "axun_nodes_PathProcessor": PathProcessor,
     "axun_nodes_QueueTrigger": ImpactQueueTriggerCountdown,
     "axun_nodes_WorkMode": WorkMode,
+    "axun_nodes_DirOpener": DirOpener,
     
     # AI助手节点组
     "SiliconCloudLLMAPI": SiliconCloudLLMAPI,
@@ -100,6 +103,7 @@ NODE_CLASS_MAPPINGS = {
     "TextCache": TextCache,
     "TextSelector": TextSelector,
     "ImageSelector": ImageSelector,
+    "StoryExtractor": StoryExtractor,
     
     # 翻译节点组
     "TranslatorNode": TranslatorNode,
@@ -125,6 +129,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "axun_nodes_PathProcessor": "🔍 Path Processor",
     "axun_nodes_QueueTrigger": "⏱️ Queue Trigger",
     "axun_nodes_WorkMode": "⚙️ Work Mode",
+    "axun_nodes_DirOpener": "📂 Directory Opener",
     
     # AI助手节点组
     "SiliconCloudLLMAPI": "🤖 Silicon Cloud LLM",
@@ -136,6 +141,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextCache": "📝 Text Cache",
     "TextSelector": "🔀 Text Selector",
     "ImageSelector": "🔄 Image Selector",
+    "StoryExtractor": "📖 Story Extractor",
     
     # 翻译节点组
     "TranslatorNode": "🌐 Translator",
