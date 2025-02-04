@@ -102,8 +102,10 @@ class TextProcessor:
                 "sample_character": ("STRING", {"multiline": True}),
                 "sample_story": ("STRING", {"multiline": True}),
                 "sample_cover": ("STRING", {"multiline": True}),
+                "sample_animation": ("STRING", {"multiline": True}),
                 "sample_reasoning": ("STRING", {"multiline": True}),
                 "sample_enter": ("STRING", {"multiline": True}),
+                "sample_all_story": ("STRING", {"multiline": True}),
                 "in_path": ("STRING", {"default": ""}),
             },
             "hidden": {
@@ -112,8 +114,8 @@ class TextProcessor:
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "INT", "INT", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ('character_prompt', 'scene_prompt', 'cover_prompt', 'reasoning_prompt', 'enter_prompt', 
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "INT", "INT", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ('character_prompt', 'scene_prompt', 'cover_prompt', 'animation_prompt', 'reasoning_prompt', 'enter_prompt', 
                    'current_index', 'max_scene', 'save_text', 'file_name', 'out_path')
     INPUT_IS_LIST = False
     OUTPUT_NODE = True
@@ -156,15 +158,12 @@ class TextProcessor:
             print(f"[TextProcessor] 开始提取角色名称，输入文本:\n{text[:200]}...")
             
             # 使用正则表达式匹配 "Character name:" 后面的内容
-            # 修改正则表达式以更好地匹配格式
             match = re.search(r'Character name:\s*\n\s*([^:\n]+):\s*([^:\n]+)', text, re.IGNORECASE | re.MULTILINE)
             if match:
-                # 获取匹配的文本并处理
-                role = match.group(1).strip()  # 例如 "father fox"
-                char_name = match.group(2).strip()  # 例如 "Theo"
+                role = match.group(1).strip()
+                char_name = match.group(2).strip()
                 print(f"[TextProcessor] 提取到角色类型: {role}, 名字: {char_name}")
                 
-                # 将空格替换为下划线，并组合
                 role = re.sub(r'\s+', '_', role)
                 result = f"{role}_{char_name}"
                 print(f"[TextProcessor] 生成的角色名称: {result}")
@@ -181,7 +180,6 @@ class TextProcessor:
         try:
             print(f"[TextProcessor] 开始提取故事信息，输入文本长度: {len(text)}")
             
-            # 使用精确的正则表达式匹配故事信息
             story_info_pattern = r'##story_info:\s*\{(.*?)\}\s*(?=##|$)'
             story_info_match = re.search(story_info_pattern, text, re.DOTALL)
             
@@ -189,19 +187,15 @@ class TextProcessor:
                 story_info_text = story_info_match.group(1).strip()
                 print(f"[TextProcessor] 找到故事信息块，长度: {len(story_info_text)}")
                 
-                # 构建完整的JSON字符串
                 json_str = "{" + story_info_text + "}"
-                
-                # 清理JSON文本
-                json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)  # 移除尾随逗号
-                json_str = re.sub(r'[\n\r]+\s*', ' ', json_str)     # 规范化换行和空格
+                json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+                json_str = re.sub(r'[\n\r]+\s*', ' ', json_str)
                 
                 try:
                     story_info = json.loads(json_str)
                     print(f"[TextProcessor] 成功解析故事信息")
                     print(f"[TextProcessor] 标题: {story_info.get('title_en', '')} / {story_info.get('title_cn', '')}")
                     
-                    # 验证必要的字段
                     required_fields = ['title_en', 'title_cn', 'summary_en', 'summary_cn', 'cover_prompt']
                     missing_fields = [field for field in required_fields if field not in story_info]
                     if missing_fields:
@@ -223,7 +217,6 @@ class TextProcessor:
         try:
             print(f"[TextProcessor] 开始提取角色描述")
             
-            # 提取完整的角色信息，包括标题
             full_text = []
             
             # 提取Character name部分
@@ -232,16 +225,18 @@ class TextProcessor:
                 name_text = name_match.group(1).strip()
                 full_text.extend(["Character name:", name_text])
             
-            # 提取Character prompts部分
-            prompts_match = re.search(r'Character prompts:\s*\n(.*?)(?=\n\s*$|\}|$)', text, re.DOTALL)
+            # 提取Character prompts部分，修改正则表达式避免捕获结尾的大括号
+            prompts_match = re.search(r'Character prompts:\s*\n(.*?)(?=\n\s*\}|$)', text, re.DOTALL)
             if prompts_match:
                 prompts_text = prompts_match.group(1).strip()
-                if full_text:  # 如果已经有name部分，添加空行
+                if full_text:
                     full_text.append("")
                 full_text.extend(["Character prompts:", prompts_text])
             
             if full_text:
                 character_text = "\n".join(full_text)
+                # 确保移除所有可能的结尾大括号和多余空白
+                character_text = character_text.strip().rstrip('}').strip()
                 print(f"[TextProcessor] 成功提取角色描述，长度: {len(character_text)}")
                 return character_text
             
@@ -252,44 +247,34 @@ class TextProcessor:
             return ""
 
     def append_text_content(self, main_text: str, shot_text: str = "", prefix_text: str = "", suffix_text: str = "") -> str:
-        """通用的文本拼接方法
-        Args:
-            main_text: 主要文本内容
-            shot_text: 镜头预设文本
-            prefix_text: 前置文本(appstart_text)
-            suffix_text: 后置文本(append_text)
-        """
+        """通用的文本拼接方法"""
         result_parts = []
         
-        # 1. 添加镜头文本
         if shot_text:
             result_parts.append(shot_text)
         
-        # 2. 添加前置文本
         if prefix_text:
             if '##' in prefix_text:
                 prefix_matches = re.finditer(r'##[^{]*:\{(.*?)\}', prefix_text, re.DOTALL)
                 prefix_text = '\n\n'.join(m.group(1).strip() for m in prefix_matches)
             result_parts.append(prefix_text)
         
-        # 3. 添加主要文本
         result_parts.append(main_text)
         
-        # 4. 添加后置文本
         if suffix_text:
             if '##' in suffix_text:
                 suffix_matches = re.finditer(r'##[^{]*:\{(.*?)\}', suffix_text, re.DOTALL)
                 suffix_text = '\n\n'.join(m.group(1).strip() for m in suffix_matches)
             result_parts.append(suffix_text)
         
-        # 使用双换行符连接所有部分
         return '\n\n'.join(part.strip() for part in result_parts if part.strip())
 
     def process_text(self, character_a_preset: str, character_b_preset: str, 
                     character_c_preset: str, shot_preset: str, appstart_text: str, 
                     append_text: str, content_type: str, scene_index: int,
                     sample_character: str = "", sample_story: str = "", sample_cover: str = "", 
-                    sample_reasoning: str = "", sample_enter: str = "", in_path: str = "",
+                    sample_animation: str = "", sample_reasoning: str = "", sample_enter: str = "", 
+                    sample_all_story: str = "", in_path: str = "",
                     unique_id=None, extra_pnginfo=None):
         """处理文本内容"""
         try:
@@ -302,6 +287,7 @@ class TextProcessor:
             character_prompt = ""
             scene_prompt = ""
             cover_prompt = ""
+            animation_prompt = ""
             reasoning_prompt = sample_reasoning.strip() if sample_reasoning else ""
             enter_prompt = sample_enter.strip() if sample_enter else ""
             current_index = scene_index
@@ -315,11 +301,11 @@ class TextProcessor:
                 # 处理角色输入
                 out_path = os.path.join(in_path, "Characters") if in_path else "Characters"
                 character_name = self.extract_character_name(sample_character)
-                character_prompt = self.extract_character_text(sample_character)
-                # 拼接 character_prompt，但 save_text 保持原始内容
-                character_prompt = self.append_text_content(character_prompt, shot_text, appstart_text, append_text)
+                # 提取角色文本并确保不包含多余的大括号
+                character_text = self.extract_character_text(sample_character)
+                character_prompt = self.append_text_content(character_text, shot_text, appstart_text, append_text).rstrip('}')
                 file_name = character_name
-                save_text = self.extract_character_text(sample_character)  # 原始内容
+                save_text = sample_character.strip()  # 直接使用原始输入
                 print(f"[TextProcessor] 处理角色输入: {character_name}")
                 
             elif sample_cover and sample_cover.strip():
@@ -336,10 +322,8 @@ class TextProcessor:
                     if cover_prompt_data:
                         cover_json = json.dumps(cover_prompt_data, ensure_ascii=False, indent=2)
                         cover_prompt_original = self.remove_leading_spaces(cover_json[1:-1].strip())
-                        # 拼接 cover_prompt，但 save_text 使用原始内容
                         cover_prompt = self.append_text_content(cover_prompt_original, shot_text, appstart_text, append_text)
                         
-                    # 获取故事摘要
                     summary_en = story_info.get("summary_en", "")
                     summary_cn = story_info.get("summary_cn", "")
                     if summary_en and summary_cn:
@@ -349,33 +333,60 @@ class TextProcessor:
                         }
                         summary_json = json.dumps(summary_dict, ensure_ascii=False, indent=2)
                         story_summary = self.remove_leading_spaces(summary_json[1:-1].strip())
-                        # save_text 组合原始的封面提示词和摘要
                         save_text = f"{cover_prompt_original}\n\n{story_summary}"
                     else:
                         save_text = cover_prompt_original
+
+            elif sample_animation and sample_animation.strip():
+                # 处理动画输入
+                out_path = os.path.join(in_path, "Animation") if in_path else "Animation"
+                file_name = "animation"
+                # 设置 animation_prompt 和 save_text
+                animation_prompt = sample_animation.strip()
+                save_text = sample_animation.strip()
                         
             elif sample_reasoning and sample_reasoning.strip():
                 # 处理推理输入
                 out_path = os.path.join(in_path, "Other") if in_path else "Other"
                 file_name = "Image_reasoning"
-                # 拼接 reasoning_prompt，但 save_text 保持原始内容
                 reasoning_prompt = self.append_text_content(sample_reasoning.strip(), shot_text, appstart_text, append_text)
-                save_text = sample_reasoning.strip()  # 原始内容
+                save_text = sample_reasoning.strip()
                 
             elif sample_enter and sample_enter.strip():
                 # 处理手动输入
                 out_path = os.path.join(in_path, "Other") if in_path else "Other"
                 file_name = "Manual_entry"
-                # 拼接 enter_prompt，但 save_text 保持原始内容
                 enter_prompt = self.append_text_content(sample_enter.strip(), shot_text, appstart_text, append_text)
-                save_text = sample_enter.strip()  # 原始内容
+                save_text = sample_enter.strip()
+
+            elif sample_all_story and sample_all_story.strip():
+                # 处理全故事输入
+                out_path = os.path.join(in_path, "Allstory") if in_path else "Allstory"
+                save_text = sample_all_story.strip()
+                
+                # 从文本中提取 title_cn
+                try:
+                    print("[TextProcessor] 开始解析story_info")
+                    # 使用正则表达式直接提取 title_cn
+                    title_match = re.search(r'"title_cn":\s*"([^"]+)"', sample_all_story)
+                    if title_match:
+                        title_cn = title_match.group(1)
+                        print(f"[TextProcessor] 成功提取标题: {title_cn}")
+                        file_name = title_cn
+                    else:
+                        print("[TextProcessor] 未找到title_cn字段")
+                        file_name = "all_story"
+                except Exception as e:
+                    print(f"[TextProcessor] 提取标题失败: {str(e)}")
+                    print("[TextProcessor] 错误详情:")
+                    traceback.print_exc()
+                    file_name = "all_story"
                 
             elif sample_story and sample_story.strip():
                 # 处理故事输入
                 out_path = os.path.join(in_path, "Story") if in_path else "Story"
                 out_path = out_path.replace("\\", "/")
                 
-                # 提取故事信息
                 story_info = self.extract_story_info(sample_story)
                 story_name = ""
                 if story_info:
@@ -385,7 +396,6 @@ class TextProcessor:
                         story_name = f"{title_en.replace(' ', '_')}_{title_cn}"
                         print(f"[TextProcessor] 生成故事名称: {story_name}")
                 
-                # 获取选中的角色信息
                 selected_characters = []
                 for preset_name in [character_a_preset, character_b_preset, character_c_preset]:
                     if preset_name != "null":
@@ -394,10 +404,8 @@ class TextProcessor:
                             selected_characters.append(char_info)
                             print(f"[TextProcessor] 添加角色: {preset_name}")
                 
-                # 分析文本内容
                 content_types = [t.strip() for t in content_type.split(',')]
                 
-                # 构建正则表达式模式
                 patterns = []
                 for ct in content_types:
                     if '*' in ct:
@@ -406,17 +414,15 @@ class TextProcessor:
                         pattern = ct
                     patterns.append(f"##({pattern}):\s*\{{(.*?)\}}")
                 
-                # 查找所有匹配的内容
                 all_matches = []
                 for pattern in patterns:
                     matches = list(re.finditer(pattern, sample_story, re.DOTALL))
                     all_matches.extend(matches)
                 
                 if not all_matches:
-                    return (character_prompt, scene_prompt, cover_prompt, reasoning_prompt, enter_prompt,
+                    return (character_prompt, scene_prompt, cover_prompt, animation_prompt, reasoning_prompt, enter_prompt,
                            current_index, max_scene, save_text, file_name, out_path)
                 
-                # 提取场景和故事内容
                 scene_matches = []
                 story_matches = []
                 for match in all_matches:
@@ -427,10 +433,9 @@ class TextProcessor:
                         story_matches.append(match)
                 
                 if not scene_matches:
-                    return (character_prompt, scene_prompt, cover_prompt, reasoning_prompt, enter_prompt,
+                    return (character_prompt, scene_prompt, cover_prompt, animation_prompt, reasoning_prompt, enter_prompt,
                            current_index, max_scene, save_text, file_name, out_path)
                 
-                # 获取最大索引
                 def extract_index(match):
                     try:
                         full_match = match.group(1)
@@ -442,57 +447,81 @@ class TextProcessor:
                 max_scene = max(extract_index(m) for m in scene_matches)
                 current_index = ((scene_index - 1) % max_scene) + 1
                 
-                # 处理场景内容
                 for match in scene_matches:
                     if extract_index(match) == current_index:
                         scene_index = match.group(1)
                         current_scene = match.group(2)
                         
-                        # 首先构建包含角色信息的场景内容
                         scene_content = ""
                         
-                        # 检查角色是否在当前场景中
-                        characters_present = ""
-                        char_match = re.search(r'"characters_present":\s*"([^"]*)"', current_scene)
+                        # 1. 提取characters_present
+                        char_match = re.search(r'"characters_present":\s*\[(.*?)\]', current_scene)
                         if char_match:
-                            characters_present = char_match.group(1).lower()
+                            chars_text = "[" + char_match.group(1) + "]"
+                            try:
+                                characters_present = json.loads(chars_text)
+                                characters_present = [name.lower() for name in characters_present]
+                                print(f"[TextProcessor] 场景中的角色: {characters_present}")
+                                # 保留characters_present部分
+                                scene_content += f'"characters_present": {chars_text}\n'
+                            except json.JSONDecodeError:
+                                print("[TextProcessor] 解析characters_present失败")
                         
-                        # 添加相关的角色信息
+                        # 2. 提取scene_description部分
+                        scene_desc = re.search(r'"scene_description":\s*(.*?)(?=\}|$)', current_scene, re.DOTALL)
+                        if scene_desc:
+                            scene_content += f'"scene_description":\n{scene_desc.group(1).strip()}\n'
+                        
+                        # 3. 处理角色内容
+                        character_contents = []
                         for char_info in selected_characters:
-                            name_match = re.search(r'Character name:[^:]*?:\s*(\w+)', char_info)
+                            # 提取角色名称
+                            name_match = re.search(r'Character name:\s*\n[^:]*:\s*(\w+)', char_info, re.DOTALL)
                             if name_match:
-                                char_name = name_match.group(1)
+                                char_name = name_match.group(1).strip()
+                                print(f"[TextProcessor] 检查角色: {char_name}")
                                 if char_name.lower() in characters_present:
-                                    char_content_match = re.search(r'##[^{]*:\{(.*?)\}', char_info, re.DOTALL)
+                                    print(f"[TextProcessor] 添加角色内容: {char_name}")
+                                    # 提取大括号内的内容
+                                    char_content_match = re.search(r'\{(.*?)\}', char_info, re.DOTALL)
                                     if char_content_match:
-                                        scene_content += char_content_match.group(1).strip() + "\n\n"
-                                    else:
-                                        scene_content += char_info + "\n\n"
+                                        # 提取并清理内容
+                                        content = char_content_match.group(1).strip()
+                                        character_contents.append(content)
+                            else:
+                                print(f"[TextProcessor] 未能提取角色名称: {char_info[:100]}...")
                         
-                        # 添加场景内容
-                        scene_content += current_scene.strip()
+                        # 4. 将角色内容添加到场景内容后面
+                        if character_contents:
+                            scene_content += "\n\n" + "\n\n".join(character_contents)
+                        
                         scene_content = self.remove_leading_spaces(scene_content)
-                        
-                        # 最后进行完整的文本拼接
                         scene_prompt = self.append_text_content(scene_content, shot_text, appstart_text, append_text)
                         break
                 
-                # 处理故事内容（用于 save_text）
                 for match in story_matches:
                     if extract_index(match) == current_index:
                         story_index = match.group(1)
-                        story_content = json.loads("{" + match.group(2) + "}")
-                        story_text_cn = story_content.get("narrative_cn", "")
-                        story_text_en = story_content.get("narrative_en", "")
-                        # save_text 只包含原始的故事内容
-                        save_text = f"{story_text_cn}\n\n{story_text_en}"
+                        story_text = match.group(2).strip()
+                        
+                        # 修改正则表达式以匹配完整的引号内容
+                        cn_match = re.search(r'"narrative_cn":\s*"(.*?)"(?=\s*[,}])', story_text, re.DOTALL)
+                        en_match = re.search(r'"narrative_en":\s*"(.*?)"(?=\s*[,}])', story_text, re.DOTALL)
+                        
+                        if cn_match and en_match:
+                            story_text_cn = cn_match.group(1).strip()
+                            story_text_en = en_match.group(1).strip()
+                            save_text = f"{story_text_cn}\n\n{story_text_en}"
+                            print(f"[TextProcessor] 提取故事内容 CN: {story_text_cn[:50]}...")
+                            print(f"[TextProcessor] 提取故事内容 EN: {story_text_en[:50]}...")
+                        else:
+                            print("[TextProcessor] 未能完整提取故事内容")
+                            save_text = ""
                         break
                 
-                # 设置文件名
                 if story_name and story_index:
                     file_name = f"{story_name}_{story_index}"
                 
-                # 更新索引
                 if unique_id:
                     next_index = (current_index % max_scene) + 1
                     text_indices[unique_id] = next_index
@@ -502,13 +531,13 @@ class TextProcessor:
             # 替换路径中的反斜杠
             out_path = out_path.replace("\\", "/")
             
-            return (character_prompt, scene_prompt, cover_prompt, reasoning_prompt, enter_prompt,
+            return (character_prompt, scene_prompt, cover_prompt, animation_prompt, reasoning_prompt, enter_prompt,
                    current_index, max_scene, save_text, file_name, out_path)
             
         except Exception as e:
             print(f"[TextProcessor] 处理文本时出错: {str(e)}")
             traceback.print_exc()
-            return "", "", "", "", "", scene_index, 1, "", "", out_path
+            return "", "", "", "", "", "", scene_index, 1, "", "", out_path
 
     def remove_leading_spaces(self, json_str: str) -> str:
         """移除JSON字符串中每行开头的空格"""
@@ -522,7 +551,7 @@ class TextProcessor:
             if node_id:
                 PromptServer.instance.send_sync("impact-node-feedback", {
                     "node_id": node_id,
-                    "widget_name": "scene_index",  # 更新widget名称
+                    "widget_name": "scene_index",
                     "type": "int",
                     "value": index
                 })

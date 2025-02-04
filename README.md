@@ -151,11 +151,17 @@ axun_nodes/
   - style_preset: 风格预设
   - scene_preset: 场景预设
   - shot_preset: 镜头预设
+  - sample_story: 故事示例（支持格式化提取）
 - 输出：
   - story_cover: 封面描述
   - story_summary: 故事概要
-  - scene_text: 场景文本
-- 说明：支持中英双语输出，自动优化格式
+  - scene_text: 场景文本（优化格式：场景描述在前，角色内容在后）
+  - character_prompt: 角色描述（优化格式处理）
+- 说明：
+  - 支持中英双语输出，自动优化格式
+  - 场景文本采用"场景描述+角色内容"的标准化格式
+  - 支持从 sample_story 输入中提取格式化内容
+  - 智能处理角色信息，确保输出格式一致性
 
 #### Text Selector 节点 (🔀)
 - 功能：按优先级选择输入文本
