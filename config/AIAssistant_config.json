@@ -1,4 +1,16 @@
 {
+    "api_configs": [
+        {
+            "name": "OpenAI官方",
+            "base_url": "https://api.openai.com/v1",
+            "api_key": ""
+        },
+        {
+            "name": "Azure OpenAI",
+            "base_url": "https://your-resource.openai.azure.com/openai/deployments/your-deployment-name",
+            "api_key": ""
+        }
+    ],
     "silicon_llm": {
         "api_key": "sk-zyzbtdtgznlcftcssyqieqmijrsauflfavqtphzebfhqqbzp",
         "api_base": "https://api.siliconflow.cn/v1",

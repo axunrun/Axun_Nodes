@@ -14,6 +14,11 @@
   - 优化用户交互体验
 
 ### 重构
+- 重构 AI 助手节点
+  - 移除 SiliconCloud 和 DeepSeek 特定服务商节点
+  - 保留通用 OpenAI 兼容格式节点
+  - 支持自定义 API 基础 URL 和密钥
+  - 优化模型获取和错误处理机制
 - 重构 Text Merger 为 Text Selector 节点
   - 优化文本选择逻辑
   - 支持四级优先级选择
