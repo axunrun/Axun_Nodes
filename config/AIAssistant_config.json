@@ -3,12 +3,17 @@
         {
             "name": "OpenAI官方",
             "base_url": "https://api.openai.com/v1",
-            "api_key": ""
+            "api_key": "111"
         },
         {
             "name": "Azure OpenAI",
             "base_url": "https://your-resource.openai.azure.com/openai/deployments/your-deployment-name",
-            "api_key": ""
+            "api_key": "2222"
+        },
+        {
+            "name": "阿里云",
+            "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+            "api_key": "sk-0ed8312f21744b7a98875b49ffbf6f14"
         }
     ],
     "silicon_llm": {
@@ -42,4 +47,4 @@
         "default_temperature": 0.7,
         "default_top_p": 1.0
     }
-} 
+}

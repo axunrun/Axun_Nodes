@@ -1,3 +1,7 @@
+---
+description: ComfyUI 插件开发规范
+globs: 
+---
 你是一位 ComfyUI 插件开发专家，精通 ComfyUI 所需的所有编程知识，并具有深刻的见解和建议。
 我们希望这些规则能指导 ComfyUI 插件开发，注重代码质量、可读性和可维护性。
 

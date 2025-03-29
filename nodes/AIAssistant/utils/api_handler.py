@@ -596,3 +596,130 @@ class DeepSeekHandler:
                     }
                 }]
             })
+
+
+class GenericOpenAIHandler:
+    """通用 OpenAI 格式 API 处理器，支持自定义服务地址"""
+    def __init__(self, base_url=None, api_key=None):
+        self.base_url = base_url
+        self.api_key = api_key
+        
+        # 如果未提供 base_url 或 api_key，使用默认值
+        if not self.base_url:
+            self.base_url = "https://api.openai.com/v1"
+        
+        # 确保 base_url 不以 / 结尾
+        if self.base_url.endswith("/"):
+            self.base_url = self.base_url[:-1]
+            
+    async def fetch_models(self) -> List[str]:
+        """获取模型列表"""
+        try:
+            if not self.api_key:
+                return ["API Key 未设置"]
+                
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{self.base_url}/models", headers=headers) as response:
+                    if response.status != 200:
+                        return [f"获取模型列表失败: {response.status} {response.reason}"]
+                    
+                    data = await response.json()
+                    if "data" in data:
+                        return [model["id"] for model in data["data"]]
+                    else:
+                        return ["获取模型列表格式异常"]
+        except Exception as e:
+            print(f"[GenericOpenAIHandler] 获取模型列表失败: {e}")
+            return [f"获取模型列表失败: {e}"]
+    
+    def get_llm_response(
+        self,
+        model: str,
+        system_prompt: str,
+        user_prompt: str,
+        max_tokens: int = 4096,
+        temperature: float = 0.7,
+        top_p: float = 0.9,
+    ) -> str:
+        """发送 LLM 请求到任意兼容 OpenAI 格式的 API"""
+        if not self.api_key:
+            raise Exception("API Key 未设置")
+            
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+        
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": top_p,
+            "n": 1,
+            "stream": False
+        }
+        
+        return send_post_request(f"{self.base_url}/chat/completions", headers=headers, payload=payload)
+    
+    def get_vlm_response(
+        self,
+        model: str,
+        system_prompt: str,
+        user_prompt: str,
+        base64_images: List[str],
+        max_tokens: int = 4096,
+        temperature: float = 0.7,
+        top_p: float = 0.9,
+        detail: str = "auto"
+    ) -> str:
+        """发送包含图像的 VLM 请求到任意兼容 OpenAI 格式的 API"""
+        if not self.api_key:
+            raise Exception("API Key 未设置")
+            
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+        
+        # 系统消息
+        messages = [
+            {"role": "system", "content": system_prompt}
+        ]
+        
+        # 用户消息（包含图像和文本）
+        user_content = []
+        for base64_image in base64_images:
+            user_content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/webp;base64,{base64_image}",
+                    "detail": detail
+                }
+            })
+        
+        # 添加文本内容
+        user_content.append({"type": "text", "text": user_prompt})
+        
+        # 添加到消息列表
+        messages.append({"role": "user", "content": user_content})
+        
+        payload = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": top_p,
+            "n": 1,
+            "stream": False
+        }
+        
+        return send_post_request(f"{self.base_url}/chat/completions", headers=headers, payload=payload)

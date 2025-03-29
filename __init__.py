@@ -1,5 +1,5 @@
 # 版本信息
-VERSION = "1.05"
+VERSION = "1.06"
 
 import os
 import sys
@@ -12,7 +12,7 @@ from aiohttp import web
 from server import PromptServer
 
 # Web目录定义
-WEB_DIRECTORY = "./web"
+WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.realpath(__file__)), "web")
 
 #######################
 # Qtools 节点组
@@ -56,7 +56,7 @@ from .nodes.Qtools.work_mode import WorkMode
 from .nodes.Qtools.dir_opener import DirOpener
 
 # AI助手节点组
-from .nodes.AIAssistant.AIAssistant import SiliconCloudLLMAPI, SiliconCloudVLMAPI, DeepSeekLLMAPI
+from .nodes.AIAssistant.AIAssistant import GenericOpenAILLMAPI, GenericOpenAIVLMAPI
 from .nodes.AIAssistant.preset_node import AIAssistantPreset
 from .nodes.AIAssistant.text_processor import TextProcessor
 from .nodes.AIAssistant.number_generator import NumberGenerator
@@ -94,9 +94,8 @@ NODE_CLASS_MAPPINGS = {
     "axun_nodes_DirOpener": DirOpener,
     
     # AI助手节点组
-    "SiliconCloudLLMAPI": SiliconCloudLLMAPI,
-    "SiliconCloudVLMAPI": SiliconCloudVLMAPI,
-    "DeepSeekLLMAPI": DeepSeekLLMAPI,
+    "GenericOpenAILLMAPI": GenericOpenAILLMAPI,
+    "GenericOpenAIVLMAPI": GenericOpenAIVLMAPI,
     "AIAssistantPreset": AIAssistantPreset,
     "TextProcessor": TextProcessor,
     "NumberGenerator": NumberGenerator,
@@ -132,9 +131,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "axun_nodes_DirOpener": "📂 Directory Opener",
     
     # AI助手节点组
-    "SiliconCloudLLMAPI": "🤖 Silicon Cloud LLM",
-    "SiliconCloudVLMAPI": "🔍 Silicon Cloud VLM",
-    "DeepSeekLLMAPI": "🤖 DeepSeek LLM",
+    "GenericOpenAILLMAPI": "🤖 OpenAI 兼容 LLM",
+    "GenericOpenAIVLMAPI": "🔍 OpenAI 兼容 VLM",
     "AIAssistantPreset": "⚙️ AI Assistant Preset",
     "TextProcessor": "📝 Text Processor",
     "NumberGenerator": "🔢 Number Generator",

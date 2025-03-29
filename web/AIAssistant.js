@@ -24,6 +24,32 @@ const createGenericOpenAIExtension = (nodeName) => {
                         return;
                     }
 
+                    // 强制刷新配置列表
+                    // 这会发送一个请求到服务器，获取所有已保存的配置
+                    const fetchConfigList = async () => {
+                        try {
+                            // 发送一个空请求，只是为了触发后端的配置加载，打印日志
+                            await fetch("/axun/AIAssistant/load_config", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    config_name: "手动输入" // 这个名称肯定不存在，但会触发配置列表加载
+                                }),
+                            });
+                            
+                            console.log("[AIAssistant] 强制刷新配置列表完成");
+                            
+                            // 这里我们不处理响应，因为我们只想触发服务器日志，查看配置是否被正确加载
+                        } catch (error) {
+                            console.warn("[AIAssistant] 刷新配置列表失败:", error);
+                        }
+                    };
+                    
+                    // 执行配置刷新
+                    fetchConfigList();
+
                     // 初始模型列表
                     if (!modelWidget.options.values || modelWidget.options.values.length === 0) {
                         modelWidget.options.values = ["请输入 API Key 和 Base URL 后点击刷新按钮获取模型列表"];
@@ -43,6 +69,8 @@ const createGenericOpenAIExtension = (nodeName) => {
                                 return;
                             }
                             
+                            console.log(`[AIAssistant] 选择配置: ${value}`);
+                            
                             // 根据选择的配置自动填充API信息
                             fetch("/axun/AIAssistant/load_config", {
                                 method: "POST",
@@ -55,12 +83,68 @@ const createGenericOpenAIExtension = (nodeName) => {
                             })
                             .then(response => response.json())
                             .then(config => {
+                                console.log(`[AIAssistant] 成功加载配置:`, config);
+                                
+                                // 填充基本API信息
                                 if (config.base_url) {
                                     baseUrlWidget.value = config.base_url;
                                 }
                                 if (config.api_key) {
                                     apiKeyWidget.value = config.api_key;
                                 }
+                                
+                                // 填充其他参数
+                                const systemPromptWidget = this.widgets.find(w => w.name === "system_prompt");
+                                const userPromptWidget = this.widgets.find(w => w.name === "user_prompt");
+                                const maxTokensWidget = this.widgets.find(w => w.name === "max_tokens");
+                                const temperatureWidget = this.widgets.find(w => w.name === "temperature");
+                                const topPWidget = this.widgets.find(w => w.name === "top_p");
+                                
+                                // 对找到的widget记录日志
+                                console.log(`[AIAssistant] 找到的widgets:`, {
+                                    systemPrompt: !!systemPromptWidget, 
+                                    userPrompt: !!userPromptWidget,
+                                    maxTokens: !!maxTokensWidget,
+                                    temperature: !!temperatureWidget,
+                                    topP: !!topPWidget
+                                });
+                                
+                                // 如果有model值并且在列表中存在，则设置
+                                if (config.model && modelWidget && modelWidget.options.values.includes(config.model)) {
+                                    modelWidget.value = config.model;
+                                }
+                                
+                                // 设置其他参数 - 添加明确的日志
+                                if (config.system_prompt && systemPromptWidget) {
+                                    console.log(`[AIAssistant] 设置system_prompt: ${config.system_prompt.substring(0, 20)}...`);
+                                    systemPromptWidget.value = config.system_prompt;
+                                } else if (config.system_prompt) {
+                                    console.warn(`[AIAssistant] 配置有system_prompt但未找到对应widget`);
+                                }
+                                
+                                if (config.user_prompt && userPromptWidget) {
+                                    console.log(`[AIAssistant] 设置user_prompt: ${config.user_prompt.substring(0, 20)}...`);
+                                    userPromptWidget.value = config.user_prompt;
+                                } else if (config.user_prompt) {
+                                    console.warn(`[AIAssistant] 配置有user_prompt但未找到对应widget`);
+                                }
+                                
+                                if (config.max_tokens !== undefined && maxTokensWidget) {
+                                    maxTokensWidget.value = config.max_tokens;
+                                }
+                                if (config.temperature !== undefined && temperatureWidget) {
+                                    temperatureWidget.value = config.temperature;
+                                }
+                                if (config.top_p !== undefined && topPWidget) {
+                                    topPWidget.value = config.top_p;
+                                }
+                                
+                                // VLM节点特有的详细度参数
+                                const detailWidget = this.widgets.find(w => w.name === "detail");
+                                if (config.detail && detailWidget) {
+                                    detailWidget.value = config.detail;
+                                }
+                                
                                 app.graph.setDirtyCanvas(true);
                             })
                             .catch(error => {
